@@ -22,18 +22,17 @@ class EventHandlers extends Base
 	{
 		$config = ConfigModel::getConfig();
 		$config->yeokka_member_srl = $config->yeokka_member_srl ?: 4;
+		$voteData = Cache::get($cacheKey);
+		if($voteData === null) {
+			$voteData = [];
+		}
+		debugPrint($voteData);
 
 		$docList = $obj->data;
 		foreach ($docList as $doc) {
 			$docSrl = $doc->get('document_srl');
 			$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
 			debugPrint($cacheKey);
-
-			$voteData = Cache::get($cacheKey);
-			if($voteData === null) {
-				$voteData = [];
-			}
-			debugPrint($voteData);
 
 			if(!array_key_exists($docSrl, $voteData)) {
 				$args = new \stdClass();
