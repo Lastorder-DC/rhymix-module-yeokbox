@@ -8,6 +8,8 @@
 	</actions>
 	<eventHandlers>
 		<eventHandler after="document.getDocumentList" class="Controllers\EventHandlers" method="afterGetDocumentList" />
+		<eventHandler after="document.updateVotedCount" class="Controllers\EventHandlers" method="afterUpdateVotedCount" />
+		<eventHandler after="document.updateVotedCountCancel" class="Controllers\EventHandlers" method="afterUpdateVotedCountCancel" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">

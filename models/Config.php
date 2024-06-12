@@ -33,6 +33,7 @@ class Config
 		{
 			self::$_cache = ModuleModel::getModuleConfig('yeokbox') ?: new \stdClass;
 		}
+		self::$_cache->yeokka_member_srl = self::$_cache->yeokka_member_srl ?: 4;
 		return self::$_cache;
 	}
 	

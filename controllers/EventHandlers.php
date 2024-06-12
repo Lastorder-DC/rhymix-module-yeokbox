@@ -18,19 +18,16 @@ class EventHandlers extends Base
 	 * 
 	 * @param object $obj
 	 */
-	public function afterGetDocumentList($obj)
-	{
+	public function afterGetDocumentList($obj) {
 		$config = ConfigModel::getConfig();
-		$config->yeokka_member_srl = $config->yeokka_member_srl ?: 4;
 		$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
 		$voteData = Cache::get($cacheKey);
 		if($voteData === null) {
 			$voteData = [];
 		}
-		debugPrint($voteData);
 
 		$docList = $obj->data;
-		foreach ($obj->data as &$doc) {
+		foreach ($obj->data as $doc) {
 			$docSrl = $doc->get('document_srl');
 
 			if(!array_key_exists($docSrl, $voteData)) {
@@ -38,12 +35,42 @@ class EventHandlers extends Base
 				$args->member_srl = $config->yeokka_member_srl;
 				$args->document_srl = $docSrl;
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
-				$voteData[$docSrl] = ($output->data->count >= 1);
+				$voteData[$docSrl] = ($output->data->count >= 1 ? "Y" : "N");
 			}
-			$doc->add('voted_heart', $voteData[$docSrl]);
 		}
 
 		Cache::set($cacheKey, $voteData);
-		debugPrint($voteData);
+	}
+
+	public function afterUpdateVotedCount($obj) {
+		$config = ConfigModel::getConfig();
+		if($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
+			return;
+		}
+
+		updateVoteCache($obj, "Y");
+	}
+
+	public function afterUpdateVotedCountCancel($obj) {
+		$config = ConfigModel::getConfig();
+		if($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
+			return;
+		}
+
+		updateVoteCache($obj, "N");
+	}
+	
+	public function updateVoteCache($obj, $vote) {
+		$config = ConfigModel::getConfig();
+		$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
+
+		$docSrl = $obj->document_srl;
+		$voteData = Cache::get($cacheKey);
+		if($voteData === null) {
+			$voteData = [];
+		}
+
+		$voteData[$docSrl] = $vote;
+		Cache::set($cacheKey, $voteData);
 	}
 }
