@@ -26,7 +26,7 @@ class EventHandlers extends Base
 			$docSrl = $doc->get('document_srl');
 			$voteData = \Rhymix\Framework\Cache::get('yeokbox_vote_' . $docSrl);
 			if($voteData === null) {
-				$args = new stdClass();
+				$args = new \stdClass();
 				$args->member_srl = $self::$member_srl;
 				$args->document_srl = $doc->get('document_srl');
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
