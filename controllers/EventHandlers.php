@@ -18,6 +18,10 @@ class EventHandlers extends Base
 	 */
 	public function afterGetDocumentList($obj)
 	{
-		debugPrint($obj);
+		$docList = $obj->data;
+		foreach ($docList as $doc) {
+			debugPrint($doc->get('document_srl'));
+		}
+		// Rhymix\Framework\Cache::get
 	}
 }
