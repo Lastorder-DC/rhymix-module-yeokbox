@@ -52,7 +52,7 @@ class Admin extends Base
 		$yeokka_member_srl = intval($vars->yeokka_member_srl);
 		
 		// 제출받은 데이터를 각각 적절히 필터링하여 설정 변경
-		if (!MemberModel::getMemberInfoByMemberSrl($yeokka_member_srl))
+		if (!\MemberModel::getMemberInfoByMemberSrl($yeokka_member_srl))
 		{
 			return new BaseObject(-1, 'msg_yeokbox_invalid_member_srl');
 		}
