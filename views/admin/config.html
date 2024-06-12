@@ -7,7 +7,7 @@
 </div>
 
 <ul class="x_nav x_nav-tabs">
-	<li class="x_active"|cond="$act == 'dispYeokboxAdminConfig'"><a href="{getUrl('', 'module', 'admin', 'act', 'dispYeokboxAdminConfig')}">{$lang->cmd_yeokbox_general_config}</a></li>
+	<li class="x_active"|cond="$act == 'dispYeokboxAdminConfig'"><a href="{getUrl('', 'module', 'admin', 'act', 'dispYeokboxAdminConfig')}">{$lang->cmd_yeokbox_board_addon_config}</a></li>
 </ul>
 
 <form class="x_form-horizontal" action="./" method="post" id="yeokbox">
@@ -22,10 +22,10 @@
 	
 	<section class="section">
 		<div class="x_control-group">
-			<label class="x_control-label">추천을 표시할 회원 번호</label>
+			<label class="x_control-label">{$lang->cmd_yeokka_member_srl}</label>
 			<div class="x_controls">
 				<input type="number" name="yeokka_member_srl" value="{$yeokbox_config->yeokka_member_srl?:4}">
-				<p class="x_help-block">게시판에 추천여부를 표시할 회원의 번호를 입력하세요.</p>
+				<p class="x_help-block">{$lang->cmd_about_yeokka_member_srl}</p>
 			</div>
 		</div>
 	</section>
