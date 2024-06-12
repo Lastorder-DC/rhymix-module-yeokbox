@@ -2,7 +2,7 @@
 <module version="0.2">
 	<title xml:lang="ko">역박스 커스텀</title>
 	<description xml:lang="ko">역박스 커스텀 모듈</description>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<date>2024-06-12</date>
 	<category>service</category>
 	<author email_address="lastorder@lastorder.xyz" link="https://lastorder.xyz/">

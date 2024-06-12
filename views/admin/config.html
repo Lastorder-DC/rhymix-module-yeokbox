@@ -22,12 +22,10 @@
 	
 	<section class="section">
 		<div class="x_control-group">
-			<label class="x_control-label" for="example_config">{$lang->cmd_yeokbox_example_config}</label>
+			<label class="x_control-label">추천을 표시할 회원 번호</label>
 			<div class="x_controls">
-				<select name="example_config" id="example_config">
-					<option value="Y" selected="selected"|cond="$yeokbox_config->example_config !== 'N'">{$lang->cmd_yes}</option>
-					<option value="N" selected="selected"|cond="$yeokbox_config->example_config === 'N'">{$lang->cmd_no}</option>
-				</select>
+				<input type="number" name="yeokka_member_srl" value="{$yeokbox_config->yeokka_member_srl?:4}">
+				<p class="x_help-block">게시판에 추천여부를 표시할 회원의 번호를 입력하세요.</p>
 			</div>
 		</div>
 	</section>

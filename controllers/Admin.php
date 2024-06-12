@@ -2,10 +2,6 @@
 
 namespace Rhymix\Modules\Yeokbox\Controllers;
 
-use Rhymix\Framework\Cache;
-use Rhymix\Framework\DB;
-use Rhymix\Framework\Exception;
-use Rhymix\Framework\Storage;
 use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use BaseObject;
 use Context;
@@ -53,15 +49,16 @@ class Admin extends Base
 		
 		// 제출받은 데이터 불러오기
 		$vars = Context::getRequestVars();
+		$yeokka_member_srl = intval($vars->yeokka_member_srl);
 		
 		// 제출받은 데이터를 각각 적절히 필터링하여 설정 변경
-		if (in_array($vars->example_config, ['Y', 'N']))
+		if (!MemberModel::getMemberInfoByMemberSrl($yeokka_member_srl))
 		{
-			$config->example_config = $vars->example_config;
+			return new BaseObject(-1, 'msg_yeokbox_invalid_member_srl');
 		}
 		else
 		{
-			return new BaseObject(-1, '설정값이 이상함');
+			$config->yeokka_member_srl = $yeokka_member_srl;
 		}
 		
 		// 변경된 설정을 저장

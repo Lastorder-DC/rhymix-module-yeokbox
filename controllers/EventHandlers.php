@@ -1,6 +1,7 @@
 <?php
 
 namespace Rhymix\Modules\Yeokbox\Controllers;
+use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use Rhymix\Framework\Cache;
 
 /**
@@ -19,18 +20,29 @@ class EventHandlers extends Base
 	 */
 	public function afterGetDocumentList($obj)
 	{
+		$config = ConfigModel::getConfig();
+		$config->yeokka_member_srl = $config->yeokka_member_srl ?: 4;
+
 		$docList = $obj->data;
 		foreach ($docList as $doc) {
 			$docSrl = $doc->get('document_srl');
-			$voteData = Cache::get('yeokbox_vote_' . $docSrl);
+			$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
+
+			$voteData = Cache::get($cacheKey);
 			if($voteData === null) {
-				$args = new \stdClass();
-				$args->member_srl = 4;
-				$args->document_srl = $doc->get('document_srl');
-				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
-				debugPrint($output->data);
-				//Cache::set('yeokbox_vote_' . $docSrl, $output->data);
+				$voteData = [];
 			}
+
+			if(!array_key_exists($docSrl, $voteData)) {
+				$args = new \stdClass();
+				$args->member_srl = $config->yeokka_member_srl;
+				$args->document_srl = $docSrl;
+				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
+				$voteData[$docSrl] = ($output->data->count >= 1);
+			}
+			$doc->add('voted_heart', $voteData[$docSrl]);
 		}
+
+		Cache::set($cacheKey, $voteData);
 	}
 }
