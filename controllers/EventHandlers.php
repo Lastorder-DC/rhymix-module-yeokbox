@@ -49,7 +49,7 @@ class EventHandlers extends Base
 			return;
 		}
 
-		updateVoteCache($obj, "Y");
+		$this->updateVoteCache($obj, "Y");
 	}
 
 	public function afterUpdateVotedCountCancel($obj) {
@@ -58,7 +58,7 @@ class EventHandlers extends Base
 			return;
 		}
 
-		updateVoteCache($obj, "N");
+		$this->updateVoteCache($obj, "N");
 	}
 	
 	public function updateVoteCache($obj, $vote) {
