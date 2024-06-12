@@ -1,6 +1,7 @@
 <?php
 
 namespace Rhymix\Modules\Yeokbox\Controllers;
+use Rhymix\Framework\Cache;
 
 /**
  * 역박스 커스텀
@@ -24,14 +25,14 @@ class EventHandlers extends Base
 		$docList = $obj->data;
 		foreach ($docList as $doc) {
 			$docSrl = $doc->get('document_srl');
-			$voteData = \Rhymix\Framework\Cache::get('yeokbox_vote_' . $docSrl);
+			$voteData = Cache::get('yeokbox_vote_' . $docSrl);
 			if($voteData === null) {
 				$args = new \stdClass();
 				$args->member_srl = $self::$member_srl;
 				$args->document_srl = $doc->get('document_srl');
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
 				debugPrint($output->data);
-				//\Rhymix\Framework\Cache::set('yeokbox_vote_' . $docSrl, $output->data);
+				//Cache::set('yeokbox_vote_' . $docSrl, $output->data);
 			}
 		}
 	}
