@@ -1,2 +1,4 @@
-# rhymix-module-yeokbox
-Rhymix module for yeokbox
+역박스 커스텀
+============
+
+POESIS 모듈 생성기를 사용하여 제작한 모듈입니다.
