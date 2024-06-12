@@ -30,7 +30,7 @@ class EventHandlers extends Base
 		debugPrint($voteData);
 
 		$docList = $obj->data;
-		foreach ($docList as $doc) {
+		foreach ($obj->data as &$doc) {
 			$docSrl = $doc->get('document_srl');
 
 			if(!array_key_exists($docSrl, $voteData)) {
@@ -38,11 +38,9 @@ class EventHandlers extends Base
 				$args->member_srl = $config->yeokka_member_srl;
 				$args->document_srl = $docSrl;
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
-				debugPrint($output);
 				$voteData[$docSrl] = ($output->data->count >= 1);
 			}
 			$doc->add('voted_heart', $voteData[$docSrl]);
-			debugPrint($doc);
 		}
 
 		Cache::set($cacheKey, $voteData);
