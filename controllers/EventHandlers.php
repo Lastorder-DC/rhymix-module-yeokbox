@@ -27,7 +27,7 @@ class EventHandlers extends Base
 		}
 
 		$docList = $obj->data;
-		foreach ($obj->data as $doc) {
+		foreach ($obj->data as &$doc) {
 			$docSrl = $doc->get('document_srl');
 
 			if(!array_key_exists($docSrl, $voteData)) {
@@ -37,6 +37,7 @@ class EventHandlers extends Base
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
 				$voteData[$docSrl] = ($output->data->count >= 1 ? "Y" : "N");
 			}
+			$doc->add('voted_heart', $voteData[$docSrl]);
 		}
 
 		Cache::set($cacheKey, $voteData);
