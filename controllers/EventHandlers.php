@@ -27,22 +27,27 @@ class EventHandlers extends Base
 		foreach ($docList as $doc) {
 			$docSrl = $doc->get('document_srl');
 			$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
+			debugPrint($cacheKey);
 
 			$voteData = Cache::get($cacheKey);
 			if($voteData === null) {
 				$voteData = [];
 			}
+			debugPrint($voteData);
 
 			if(!array_key_exists($docSrl, $voteData)) {
 				$args = new \stdClass();
 				$args->member_srl = $config->yeokka_member_srl;
 				$args->document_srl = $docSrl;
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
+				debugPrint($output);
 				$voteData[$docSrl] = ($output->data->count >= 1);
 			}
 			$doc->add('voted_heart', $voteData[$docSrl]);
+			debugPrint($doc);
 		}
 
 		Cache::set($cacheKey, $voteData);
+		debugPrint($voteData);
 	}
 }
