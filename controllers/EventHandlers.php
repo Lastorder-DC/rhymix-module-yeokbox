@@ -12,9 +12,6 @@ use Rhymix\Framework\Cache;
  */
 class EventHandlers extends Base
 {
-	// TODO 설정으로 분리
-	private static $member_srl = 4;
-
 	/**
 	 * 여까 추천 글 체크
 	 * 
@@ -28,7 +25,7 @@ class EventHandlers extends Base
 			$voteData = Cache::get('yeokbox_vote_' . $docSrl);
 			if($voteData === null) {
 				$args = new \stdClass();
-				$args->member_srl = $self::$member_srl;
+				$args->member_srl = 4;
 				$args->document_srl = $doc->get('document_srl');
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
 				debugPrint($output->data);
