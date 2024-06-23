@@ -6,4 +6,4 @@ $lang->cmd_yeokka_member_srl = '추천을 표시할 회원 번호';
 $lang->cmd_about_yeokka_member_srl = '게시판에 추천여부를 표시할 회원의 번호를 입력하세요.';
 $lang->msg_yeokbox_invalid_member_srl = '올바르지 않은 회원번호';
 $lang->cmd_vote_count = '념글컷';
-$lang->msg_yeokbox_invalid_member_srl = '념글에 해당하는 추천수 컷';
+$lang->cmd_about_vote_count = '념글에 해당하는 추천수 컷';
