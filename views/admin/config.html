@@ -29,6 +29,16 @@
 			</div>
 		</div>
 	</section>
+
+	<section class="section">
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->cmd_vote_count}</label>
+			<div class="x_controls">
+				<input type="number" name="vote_count" value="{$yeokbox_config->vote_count?:10}">
+				<p class="x_help-block">{$lang->cmd_about_vote_count}</p>
+			</div>
+		</div>
+	</section>
 	
 	<div class="btnArea x_clearfix">
 		<button type="submit" class="x_btn x_btn-primary x_pull-right">{$lang->cmd_registration}</button>
