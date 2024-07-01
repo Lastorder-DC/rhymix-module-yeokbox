@@ -86,11 +86,12 @@ class EventHandlers extends Base
 		$args = new \stdClass();
 		$args->member_srl = 4;
 		$output = executeQueryArray('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
-		debugPrint($output->data);
 
 		$oNcenterliteController = getController('ncenterlite');
 		foreach($output->data as $friend) {
-			$oNcenterliteController->sendNotification(4, $friend->member_srl, "여까 새 글 알림! - " . $obj->title, getNotEncodedUrl('', 'mid', $module_info->mid, 'document_srl', $obj->document_srl), $obj->document_srl);
+			debugPrint($friend);
+			$msg = $oNcenterliteController->sendNotification(4, $friend->member_srl, "여까 새 글 알림! - " . $obj->title, getNotEncodedUrl('', 'mid', $module_info->mid, 'document_srl', $obj->document_srl), $obj->document_srl);
+			debugPrint($msg);
 		}
 	}
 }
