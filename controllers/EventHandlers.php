@@ -78,6 +78,7 @@ class EventHandlers extends Base
 	public function afterInsertDocument($obj) {
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
+		debugPrint($obj);
 
 		// 작성자가 여까가 아니면 리턴 $config->yeokka_member_srl
 		if($obj->member_srl != 4) return;
@@ -85,6 +86,7 @@ class EventHandlers extends Base
 		$args = new \stdClass();
 		$args->member_srl = 4;
 		$output = executeQuery('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
+		debugPrint($output->data);
 
 		$oNcenterliteController = getController('ncenterlite');
 		foreach($output->data as $friend) {
