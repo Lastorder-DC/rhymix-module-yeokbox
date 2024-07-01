@@ -80,10 +80,10 @@ class EventHandlers extends Base
 		$config = ConfigModel::getConfig();
 
 		// 작성자가 여까가 아니면 리턴 
-		if($obj->member_srl != $config->yeokka_member_srl) return;
+		if($obj->member_srl != intval($config->yeokka_member_srl)) return;
 
 		$args = new \stdClass();
-		$args->member_srl = $config->yeokka_member_srl;
+		$args->member_srl = intval($config->yeokka_member_srl);
 		$output = executeQueryArray('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
 
 		$oNcenterliteController = getController('ncenterlite');
