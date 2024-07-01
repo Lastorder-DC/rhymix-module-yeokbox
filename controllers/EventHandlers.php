@@ -78,13 +78,12 @@ class EventHandlers extends Base
 	public function afterInsertDocument($obj) {
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
-		debugPrint($obj);
 
-		// 작성자가 여까가 아니면 리턴 $config->yeokka_member_srl
-		if($obj->member_srl != 4) return;
+		// 작성자가 여까가 아니면 리턴 
+		if($obj->member_srl != $config->yeokka_member_srl) return;
 
 		$args = new \stdClass();
-		$args->member_srl = 4;
+		$args->member_srl = $config->yeokka_member_srl;
 		$output = executeQueryArray('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
 
 		$oNcenterliteController = getController('ncenterlite');
@@ -93,7 +92,6 @@ class EventHandlers extends Base
 			$message->summary = "여까 새 글 알림! - " . $obj->title;
 			$message->subject = "여까 새 글 알림!";
 			$msg = $oNcenterliteController->sendNotification(4, $friend->member_srl, $message, getNotEncodedUrl('', 'mid', $module_info->mid, 'document_srl', $obj->document_srl), $obj->document_srl);
-			debugPrint($msg);
 		}
 	}
 }
