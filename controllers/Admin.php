@@ -35,7 +35,7 @@ class Admin extends Base
 		// Context에 세팅
 		Context::set('yeokbox_config', $config);
 
-		$args = new stdClass();
+		$args = new \stdClass();
 		$args->member_srl = $config->yeokka_member_srl;
 		$output = executeQuery('yeokbox.getFriendList', $args);
 		debugPrint($output);
