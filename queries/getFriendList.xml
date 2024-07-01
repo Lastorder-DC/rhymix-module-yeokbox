@@ -1,0 +1,13 @@
+<query id="getFriendList" action="select">
+    <tables>
+        <table name="member_friend" alias="friend" />
+        <table name="member" alias="member" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="friend.member_srl" var="member_srl" pipe="and" />
+        <condition operation="equal" column="member.member_srl" var="friend.target_srl" pipe="and" />
+    </conditions>
+</query>

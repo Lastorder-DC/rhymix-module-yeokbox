@@ -74,4 +74,7 @@ class EventHandlers extends Base
 		$voteData[$docSrl] = $vote;
 		Cache::set($cacheKey, $voteData);
 	}
+
+	public function afterInsertDocument($obj) {
+	}
 }

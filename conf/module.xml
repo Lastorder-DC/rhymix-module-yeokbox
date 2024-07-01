@@ -10,6 +10,7 @@
 		<eventHandler after="document.getDocumentList" class="Controllers\EventHandlers" method="afterGetDocumentList" />
 		<eventHandler after="document.updateVotedCount" class="Controllers\EventHandlers" method="afterUpdateVotedCount" />
 		<eventHandler after="document.updateVotedCountCancel" class="Controllers\EventHandlers" method="afterUpdateVotedCountCancel" />
+		<eventHandler after="document.insertDocument" class="Controllers\EventHandlers" method="afterInsertDocument" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">
