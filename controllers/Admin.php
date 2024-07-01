@@ -37,7 +37,7 @@ class Admin extends Base
 
 		$args = new \stdClass();
 		$args->member_srl = $config->yeokka_member_srl;
-		$output = executeQuery('yeokbox.getFriendList', $args);
+		$output = executeQuery('yeokbox.getFriendList', $args, ['member_srl']);
 		debugPrint($output);
 		
 		// 스킨 파일 지정
