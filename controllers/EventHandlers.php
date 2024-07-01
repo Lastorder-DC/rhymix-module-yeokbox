@@ -85,7 +85,7 @@ class EventHandlers extends Base
 
 		$args = new \stdClass();
 		$args->member_srl = 4;
-		$output = executeQuery('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
+		$output = executeQueryArray('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
 		debugPrint($output->data);
 
 		$oNcenterliteController = getController('ncenterlite');
