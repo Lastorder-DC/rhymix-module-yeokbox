@@ -89,8 +89,10 @@ class EventHandlers extends Base
 
 		$oNcenterliteController = getController('ncenterlite');
 		foreach($output->data as $friend) {
-			debugPrint($friend);
-			$msg = $oNcenterliteController->sendNotification(4, $friend->member_srl, "여까 새 글 알림! - " . $obj->title, getNotEncodedUrl('', 'mid', $module_info->mid, 'document_srl', $obj->document_srl), $obj->document_srl);
+			$message = new \stdClass();
+			$message->summary = "여까 새 글 알림! - " . $obj->title;
+			$message->subject = "여까 새 글 알림!";
+			$msg = $oNcenterliteController->sendNotification(4, $friend->member_srl, $message, getNotEncodedUrl('', 'mid', $module_info->mid, 'document_srl', $obj->document_srl), $obj->document_srl);
 			debugPrint($msg);
 		}
 	}
