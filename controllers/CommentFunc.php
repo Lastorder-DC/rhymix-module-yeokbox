@@ -23,7 +23,8 @@ class CommentFunc extends Base
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
         $target_srl = intval(Context::get('target_srl'));
-        $this->add('target_srl', $target_srl);
+        $comment_list = \CommentModel::getCommentList($target_srl);
+        $this->add('comment_list', $comment_list);
 
 		return $output;
 	}
