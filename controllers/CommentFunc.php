@@ -24,8 +24,7 @@ class CommentFunc extends Base
 		$config = ConfigModel::getConfig();
         $target_srl = intval(Context::get('target_srl'));
         $comment_list = \CommentModel::getCommentList($target_srl);
+        debugPrint($comment_list);
         $this->add('comment_list', $comment_list);
-
-		return $output;
 	}
 }
