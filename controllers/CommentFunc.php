@@ -22,5 +22,11 @@ class CommentFunc extends Base
 	{
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
+        $output = new BaseObject();
+        $output->setMessage('test');
+        $output->add('test', 'test_str');
+        $this->add('test2', $output->get('test'));
+
+		return $output;
 	}
 }
