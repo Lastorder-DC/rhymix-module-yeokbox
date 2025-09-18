@@ -1,11 +1,6 @@
-(function($) {
-	
-	// 페이지 로딩 완료 전 실행할 스크립트 (전역 함수 선언 등)
-	
-	$(function() {
-		
-		// 페이지 로딩 완료 후 실행할 스크립트 (jQuery 이벤트 등록 등)
-		
+function fixAttendance() {
+	if (!confirm('연속 출석 데이터를 재정비합니다. 진행하시겠습니까?')) return false;
+	exec_json('yeokbox.procYeokboxAdminFixAttendance', {}, function(ret) {
+		console.log(ret);
 	});
-	
-})(jQuery);
+}

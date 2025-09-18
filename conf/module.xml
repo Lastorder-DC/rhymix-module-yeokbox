@@ -5,6 +5,7 @@
 	<actions>
 		<action name="dispYeokboxAdminConfig" class="Controllers\Admin" menu-name="yeokbox" admin-index="true" />
 		<action name="procYeokboxAdminInsertConfig" class="Controllers\Admin" />
+		<action name="procYeokboxAdminFixAttendance" class="Controllers\Admin" />
 		<action name="procYeokboxPickComment" class="Controllers\CommentFunc" />
 	</actions>
 	<eventHandlers>
@@ -12,6 +13,10 @@
 		<eventHandler after="document.updateVotedCount" class="Controllers\EventHandlers" method="afterUpdateVotedCount" />
 		<eventHandler after="document.updateVotedCountCancel" class="Controllers\EventHandlers" method="afterUpdateVotedCountCancel" />
 		<eventHandler after="document.insertDocument" class="Controllers\EventHandlers" method="afterInsertDocument" />
+		<eventHandler before="comment.insertComment" class="Controllers\EventHandlers" method="beforeInsertContent" />
+		<eventHandler before="comment.updateComment" class="Controllers\EventHandlers" method="beforeInsertContent" />
+		<eventHandler before="document.insertDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
+		<eventHandler before="document.updateDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">
