@@ -1,8 +1,15 @@
 <?php
-
 namespace Rhymix\Modules\Yeokbox\Controllers;
+
+require 'DiceCalc/Calc.php';
+require 'DiceCalc/CalcSet.php';
+require 'DiceCalc/CalcDice.php';
+require 'DiceCalc/CalcOperation.php';
+require 'DiceCalc/Random.php';
+
 use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use Rhymix\Framework\Cache;
+use DiceCalc\Calc as Calc;
 
 /**
  * 역박스 커스텀
@@ -119,33 +126,35 @@ class EventHandlers extends Base
 	public function beforeInsertContent(&$obj) {
 		$content = $obj->content;
 
-		// 댓글 내용에서 {3d6+6} 형태의 문자열을 찾아서 다이스 롤링
-		$pattern = '/\{(\d*)d(\d+)([+-]\d+)?\}/';
+		// 댓글 내용에서 {문자} 형태의 문자열을 찾아서 다이스 롤링
+		$pattern = '/\{([^{}]+)\}/';
 		preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
 		foreach ($matches as $match) {
 			$originalRollString = $match[0];
-			$numDice = intval($match[1]) ?: 1; // d 이전 숫자가 없으면 1로 설정
-			$numSides = intval($match[2]);
-			$modifier = isset($match[3]) ? intval($match[3]) : 0;
-			$modifierText = $modifier !== 0 ? (($modifier > 0 ? '+' : '') . $modifier) : '';
-			$diceText = $numDice . 'd' . $numSides . $modifierText;
+			$expression = $match[1];
 
-			if ($numSides <= 0 || $numDice <= 0 || $numDice > 100 || $numSides > 1000) {
-				// 유효하지 않은 경우 오류 메세지 출력
-				$content = str_replace($originalRollString, '[(' . $diceText . ') 잘못된 사용법]', $content);
+			try {
+				$calc = new Calc($expression);
+				$diceText = $calc->infix();
+				$rollResult = $calc();
+			} catch (\Exception $e) {
+				// 계산식이 잘못된 경우 원래 문자열 유지
 				continue;
 			}
 
-			$rolls = [];
-			for ($i = 0; $i < $numDice; $i++) {
-				$rolls[] = rand(1, $numSides);
+			// diceText나 rollResult가 비어있으면 원래 문자열 유지
+			if(!$diceText || !$rollResult) {
+				continue;
 			}
-			$sum = array_sum($rolls);
-			$total = $sum + $modifier;
-			$rollResult = '[(' . $diceText . ') ' . implode(' + ', $rolls) . ($modifier !== 0 ? (' (' . ($modifier > 0 ? '+' : '') . $modifier . ')') : '') . ' = ' . $total . ']';
+
+			// diceText와 rollResult가 동일하면 rollResult만 표시
+			if($diceText == $rollResult) {
+				$content = preg_replace('/' . preg_quote($originalRollString, '/') . '/', $rollResult, $content, 1);
+				continue;
+			}
 
 			// 여러 다이스 롤을 올바르게 처리하기 위해 첫번째 다이스만 변환
-			$content = preg_replace('/' . preg_quote($originalRollString, '/') . '/', $rollResult, $content, 1);
+			$content = preg_replace('/' . preg_quote($originalRollString, '/') . '/', $diceText . ' = ' . $rollResult, $content, 1);
 		}
 
 		$obj->content = $content;
