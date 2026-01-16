@@ -7,12 +7,15 @@
 		<action name="procYeokboxAdminInsertConfig" class="Controllers\Admin" />
 		<action name="procYeokboxAdminFixAttendance" class="Controllers\Admin" />
 		<action name="procYeokboxPickComment" class="Controllers\CommentFunc" />
+		<action name="procYeokboxBumpDocument" class="Controllers\DocumentFunc" />
+		<action name="procYeokboxMoveCategoryBulk" class="Controllers\DocumentFunc" />
 	</actions>
 	<eventHandlers>
 		<eventHandler after="document.getDocumentList" class="Controllers\EventHandlers" method="afterGetDocumentList" />
 		<eventHandler after="document.updateVotedCount" class="Controllers\EventHandlers" method="afterUpdateVotedCount" />
 		<eventHandler after="document.updateVotedCountCancel" class="Controllers\EventHandlers" method="afterUpdateVotedCountCancel" />
-		<eventHandler after="document.insertDocument" class="Controllers\EventHandlers" method="afterInsertDocument" />
+		<eventHandler after="document.publishDocument" class="Controllers\EventHandlers" method="afterPublishDocument" />
+		<eventHandler after="document.updateDocument" class="Controllers\EventHandlers" method="afterUpdateDocument" />
 		<eventHandler before="comment.insertComment" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="comment.updateComment" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="document.insertDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />

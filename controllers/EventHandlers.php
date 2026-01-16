@@ -21,19 +21,67 @@ use DiceCalc\Calc as Calc;
 class EventHandlers extends Base
 {
 	/**
-	 * 여까 추천 글 체크
+	 * 첨부파일 뱃지정보 생성용 함수
+	 * 
+	 * @param DocumentItem $doc
+	 */
+	private function getMediaBadgeData($doc) {
+		$attach_list = $doc->getUploadedFiles();
+		$content = $doc->get('content');
+		
+		$image_attach = false;
+		$video_attach = false;
+		$youtube_attach = false;
+		$chzzk_attach = false;
+
+		if ($attach_list && count($attach_list) > 0) {
+			foreach ($attach_list as $val) {
+				if (strpos($val->mime_type, 'image') !== false) {
+					$image_attach = true;
+				}
+				if (strpos($val->mime_type, 'video') !== false) {
+					$video_attach = true;
+				}
+			}
+		}
+
+		if (preg_match('/<iframe[^>]*src=["\'](?:https?:)?\/\/(?:[\w-]+\.)*(?:youtube\.com|youtu\.be)/i', $content)) {
+			$youtube_attach = true;
+		}
+
+		if (preg_match('/<iframe[^>]*src=["\'](?:https?:)?\/\/(?:[\w-]+\.)*chzzk\.naver\.com/i', $content)) {
+			$chzzk_attach = true;
+		}
+
+		$badgeInfo = new \stdClass();
+		$badgeInfo->image_attach = $image_attach;
+		$badgeInfo->video_attach = $video_attach;
+		$badgeInfo->youtube_attach = $youtube_attach;
+		$badgeInfo->chzzk_attach = $chzzk_attach;
+
+		return $badgeInfo;
+	}
+
+	/**
+	 * 여까 추천 글 체크 및 첨부파일 뱃지정보 생성
 	 * 
 	 * @param object $obj
 	 */
 	public function afterGetDocumentList($obj) {
 		$config = ConfigModel::getConfig();
-		$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
-		$voteData = Cache::get($cacheKey);
+		$cacheKeyVote = 'yeokbox_vote_' . $config->yeokka_member_srl;
+		$cacheKeyAttachBadge = 'attach_badge_v3'; 
+
+		$voteData = Cache::get($cacheKeyVote);
+		$badgeData = Cache::get($cacheKeyAttachBadge);
+
 		if($voteData === null) {
 			$voteData = [];
 		}
+		if($badgeData === null) {
+			$badgeData = [];
+		}
 
-		$docList = $obj->data;
 		foreach ($obj->data as &$doc) {
 			$docSrl = $doc->get('document_srl');
 
@@ -44,10 +92,31 @@ class EventHandlers extends Base
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
 				$voteData[$docSrl] = ($output->data->count >= 1 ? "Y" : "N");
 			}
-			$doc->add('voted_heart', $voteData[$docSrl]);
+
+			if(!array_key_exists($docSrl, $badgeData)) {
+				$badgeData[$docSrl] = $this->getMediaBadgeData($doc);
+			}
+		}
+		Cache::set($cacheKeyVote, $voteData);
+		Cache::set($cacheKeyAttachBadge, $badgeData);
+	}
+
+	/**
+	 * 글 업데이트시 첨부파일 뱃지 캐시 삭제
+	 * 
+	 * @param object $obj
+	 */
+	public function afterUpdateDocument($obj) {
+		$document_srl = $obj->document_srl;
+
+		$cacheKeyAttachBadge = 'attach_badge_v3'; 
+		$badgeData = Cache::get($cacheKeyAttachBadge);
+		if($badgeData === null) {
+			$badgeData = [];
 		}
 
-		Cache::set($cacheKey, $voteData);
+		unset($badgeData[$document_srl]);
+		Cache::set($cacheKeyAttachBadge, $badgeData);
 	}
 
 	public function afterUpdateVotedCount($obj) {
@@ -109,7 +178,7 @@ class EventHandlers extends Base
 		}
 	}
 
-	public function afterInsertDocument($obj) {
+	public function afterPublishDocument($obj) {
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
 
