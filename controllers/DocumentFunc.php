@@ -85,8 +85,6 @@ class DocumentFunc extends Base
 	 */
 	public function procYeokboxMoveCategoryBulk()
 	{
-		return new baseObject(-1, 'msg_not_permitted');
-		/*
 		$logged_info = Context::get('logged_info');
 		$oDocumentController = getController('document');
 
@@ -97,12 +95,15 @@ class DocumentFunc extends Base
 		$vars = Context::getRequestVars();
 		$category_srl = intval($vars->category_srl);
 		$target_srl = intval($vars->target_srl);
-		$module_srl = 252;
+		$module_srl = intval($vars->module_srl);
+		if(!$category_srl || !$target_srl || !$module_srl) {
+			return new baseObject(-1, "필수 값이 누락되었습니다");
+		}
 
 		$args = new \stdClass();
 		$args->list_count = 1000;
 		$args->category_srl = $category_srl;
-		$document_list = \DocumentModel::getDocumentList($args, false, false);
+		$document_list = \DocumentModel::getDocumentList($args, false, false, ['document_srl']);
 		if(!$document_list->toBool()) {
 			return $document_list;
 		}
@@ -112,7 +113,7 @@ class DocumentFunc extends Base
 			$args = new \stdClass();
 			$args->document_srl = $document->document_srl;
 			$args->category_srl = $target_srl;
-			debugPrint("Category move for " . $args->document_srl . " from " . intval($vars->category_srl) . " to " . $args->category_srl);
+
 			$output = executeQuery('yeokbox.updateDocumentCategorySrl', $args);
 			\DocumentController::clearDocumentCache($args->document_srl);
 			if(!$output->toBool()) {
@@ -123,7 +124,6 @@ class DocumentFunc extends Base
 		$oDocumentController->updateCategoryCount($module_srl, $category_srl);
 		$oDocumentController->updateCategoryCount($module_srl, $target_srl);
 
-		return new baseObject(0, '최대 1000개의 글의 카테고리 일괄 이전을 완료했습니다. 완료되지 않았다면 다시 실행해주세요.');
-		*/
+		return new baseObject(0, '최대 1000개의 글의 카테고리 일괄 이전을 완료했습니다.');
 	}
 }
