@@ -20,8 +20,6 @@ class CommentFunc extends Base
 	 */
 	public function procYeokboxPickComment()
 	{
-		// 현재 설정 상태 불러오기
-		$config = ConfigModel::getConfig();
         $target_srl = intval(Context::get('target_srl'));
         $comment_list = \CommentModel::getCommentList($target_srl, 0, 0, 1000);
         $comment_list = $comment_list->data;

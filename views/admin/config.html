@@ -34,8 +34,28 @@
 		<div class="x_control-group">
 			<label class="x_control-label">{$lang->cmd_vote_count}</label>
 			<div class="x_controls">
-				<input type="number" name="vote_count" value="{$yeokbox_config->vote_count?:10}">
+				<input type="number" name="vote_count" value="{$yeokbox_config->vote_count?:50}">
 				<p class="x_help-block">{$lang->cmd_about_vote_count}</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->cmd_super_vote_count}</label>
+			<div class="x_controls">
+				<input type="number" name="super_vote_count" value="{$yeokbox_config->super_vote_count?:50}">
+				<p class="x_help-block">{$lang->cmd_about_super_vote_count}</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->cmd_super_read_count}</label>
+			<div class="x_controls">
+				<input type="number" name="read_count" value="{$yeokbox_config->read_count?:1000}">
+				<p class="x_help-block">{$lang->cmd_about_super_read_count}</p>
 			</div>
 		</div>
 	</section>

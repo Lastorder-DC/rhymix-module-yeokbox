@@ -31,7 +31,7 @@ class EventHandlers extends Base
 		$youtube_attach = false;
 		$chzzk_attach = false;
 
-		// 첨부파일 검사: 이미지와 비디오가 모두 발견되면 루프 중단 (최적화)
+		// 첨부파일 검사: 이미지와 비디오가 모두 발견되면 루프 중단
 		if ($attach_list && count($attach_list) > 0) {
 			foreach ($attach_list as $val) {
 				if (!$image_attach && strpos($val->mime_type, 'image') !== false) {
@@ -50,7 +50,6 @@ class EventHandlers extends Base
 		if (preg_match('/<iframe[^>]*src=["\'](?:https?:)?\/\/(?:[\w-]+\.)*(?:youtube\.com|youtu\.be)/i', $content)) {
 			$youtube_attach = true;
 		}
-
 		if (preg_match('/<iframe[^>]*src=["\'](?:https?:)?\/\/(?:[\w-]+\.)*chzzk\.naver\.com/i', $content)) {
 			$chzzk_attach = true;
 		}
@@ -121,7 +120,6 @@ class EventHandlers extends Base
 		$cacheKeyAttachBadge = 'attach_badge_v3'; 
 		
 		$badgeData = Cache::get($cacheKeyAttachBadge);
-		
 		if ($badgeData !== null && isset($badgeData[$document_srl])) {
 			unset($badgeData[$document_srl]);
 			Cache::set($cacheKeyAttachBadge, $badgeData);

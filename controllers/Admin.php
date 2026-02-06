@@ -66,6 +66,8 @@ class Admin extends Base
 			$config->yeokka_member_srl = $yeokka_member_srl;
 		}
 		$config->vote_count = intval($vars->vote_count);
+		$config->super_vote_count = intval($vars->super_vote_count);
+		$config->read_count = intval($vars->read_count);
 		
 		// 변경된 설정을 저장
 		$output = ConfigModel::setConfig($config);

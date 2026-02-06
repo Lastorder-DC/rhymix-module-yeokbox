@@ -13,6 +13,9 @@ use Context;
  */
 class DocumentFunc extends Base
 {
+	/*
+	 * 글을 끌어올릴수 있는지 날짜로 체크
+	 */
 	private function checkBumpable($dateString) {
 		if (!$dateString) {
 			return false;
@@ -56,6 +59,11 @@ class DocumentFunc extends Base
 			return new BaseObject(-1, '구인 카테고리 이외 글은 끌어올릴 수 없습니다.');
 		}
 
+		// 관리자가 아니라면 최소 1000포인트는 있어야 하도록 체크
+		if($logged_info->is_admin !== 'Y' && \PointModel::getPoint($logged_info->member_srl) < 1000) {
+			return new BaseObject(-1, '포인트가 부족합니다.');
+		}
+
 		// 업데이트 실행
 		$obj = new \stdClass;
 		$obj->document_srl = $oDocument->get('document_srl');
@@ -70,8 +78,8 @@ class DocumentFunc extends Base
 		// 캐시 삭제
 		\DocumentController::clearDocumentCache($obj->document_srl);
 		
-		// 1000포인트 차감
-		\PointController::setPoint($logged_info->member_srl, 1000, 'minus');
+		// 관리자가 아니라면 1000포인트 차감
+		if($logged_info->is_admin !== 'Y') \PointController::setPoint($logged_info->member_srl, 1000, 'minus');
 
 		return new BaseObject(0, '글을 끌어올렸습니다.');
 	}
@@ -82,7 +90,6 @@ class DocumentFunc extends Base
 	public function procYeokboxMoveCategoryBulk()
 	{
 		$logged_info = Context::get('logged_info');
-
 		if($logged_info->is_admin !== 'Y') {
 			return new BaseObject(-1, 'msg_not_permitted');
 		}
@@ -143,6 +150,6 @@ class DocumentFunc extends Base
 		$oDocumentController->updateCategoryCount($module_srl, $category_srl);
 		$oDocumentController->updateCategoryCount($module_srl, $target_srl);
 
-		return new BaseObject(0, '최대 1000개의 글의 카테고리 일괄 이전을 완료했습니다.');
+		return new BaseObject(0, '최대 10000개의 글의 카테고리 일괄 이전을 완료했습니다.');
 	}
 }
