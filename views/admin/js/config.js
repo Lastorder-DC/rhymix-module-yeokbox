@@ -6,11 +6,11 @@ function fixAttendance() {
 
 	exec_json('yeokbox.procYeokboxAdminFixAttendance', {}, function (ret) {
 		if (ret && ret.error) {
-			console.error('연속 출석 재정비 실패', ret);
+			alert('연속 출석 재정비 실패', ret);
 			return;
 		}
 
-		console.info('연속 출석 재정비 완료', ret);
+		alert('연속 출석 재정비 완료', ret);
 	});
 
 	return true;
