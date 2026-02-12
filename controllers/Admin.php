@@ -17,6 +17,11 @@ use DateTime;
 class Admin extends Base
 {
 	/**
+	 * 출석 연속일을 계산할 때 사용하는 날짜 포맷.
+	 */
+	private const DATE_FORMAT = 'Ymd';
+
+	/**
 	 * 초기화
 	 */
 	public function init()
@@ -36,10 +41,6 @@ class Admin extends Base
 		// Context에 세팅
 		Context::set('yeokbox_config', $config);
 
-		$args = new \stdClass();
-		$args->member_srl = $config->yeokka_member_srl;
-		$output = executeQuery('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
-		
 		// 스킨 파일 지정
 		$this->setTemplateFile('config');
 	}
@@ -81,9 +82,14 @@ class Admin extends Base
 		$this->setRedirectUrl(Context::get('success_return_url'));
 	}
 
-	public function procYeokboxAdminFixAttendance() {
-		$vars = Context::getRequestVars();
-		$member_srl = intval($vars->member_srl);
+	/**
+	 * 모든 회원의 오늘 기준 연속 출석 일수를 재계산합니다.
+	 *
+	 * @return BaseObject|void
+	 */
+	public function procYeokboxAdminFixAttendance()
+	{
+		$today = date(self::DATE_FORMAT);
 
 		// member 모듈의 getMembers 쿼리 호출
 		$args = new \stdClass();
@@ -107,22 +113,22 @@ class Admin extends Base
 			}
 
 			// 출석 기록이 없으면 다음 회원으로 넘어감
-			if(empty($output->data)) {
+			if (empty($output->data)) {
 				continue;
 			}
 			
 			// 가장 최근 출석일이 오늘이 아니면 다음 회원으로 넘어감
-			if($output->data[0]->regdate != date('Ymd')) {
+			if ($output->data[0]->regdate !== $today) {
 				continue;
 			}
 
 			// 연속 출석 일수 계산
-			$consecutive_days = calculateConsecutiveAttendance($output->data, date('Ymd'));
+			$consecutive_days = $this->calculateConsecutiveAttendance($output->data, $today);
 
 			// DB상 연속 출석일을 가져옴
 			$oAttendanceModel = getModel('attendance');
-			$data = $oAttendanceModel->getContinuityDataByMemberSrl($member_srl, date('Ymd'));
-			if($data->continuity >= $consecutive_days) {
+			$data = $oAttendanceModel->getContinuityDataByMemberSrl($member_srl, $today);
+			if ($data->continuity >= $consecutive_days) {
 				// 이미 연속 출석 일수가 같거나 크면 다음 회원으로 넘어감
 				continue;
 			}
@@ -133,7 +139,7 @@ class Admin extends Base
 			$args = new \stdClass();
 			$args->member_srl = $member_srl;
 			$args->continuity = $consecutive_days;
-			$args->regdate = date('Ymd').'235959';
+			$args->regdate = $today . '235959';
 			$output = executeQuery('attendance.updateTotal', $args);
 			if (!$output->toBool()) {
 				continue;
@@ -146,45 +152,29 @@ class Admin extends Base
 		$this->add('attendance_debug', $debugArray);
 		$this->add('attendance_debug_count', count($debugArray));
 	}
-}
 
-/**
- * 특정 날짜를 기준으로 연속 출석 일수를 계산합니다.
- *
- * @param string $jsonString 출석 기록이 담긴 JSON 데이터 문자열
- * @param string $todayDateString 기준 날짜 ('Ymd' 형식, 예: '20250828')
- * @return int 연속 출석 일수
- */
-function calculateConsecutiveAttendance($data, $todayDateString) {
-    // 1. 검색 효율을 위해 모든 출석 날짜('regdate')만 추출하여 새 배열을 만듭니다.
-    // in_array() 함수는 큰 배열에서 검색할 때 array_search()보다 효율적일 수 있습니다.
-    $attendanceDates = array_column($data, 'regdate');
-    $attendanceDateSet = array_flip($attendanceDates); // 값과 키를 뒤집어 검색 속도를 O(1)로 만듭니다.
+	/**
+	 * 특정 날짜를 기준으로 연속 출석 일수를 계산합니다.
+	 *
+	 * @param array<int, object> $attendanceData 출석 데이터 목록
+	 * @param string             $todayDate      기준 날짜 (Ymd)
+	 * @return int
+	 */
+	private function calculateConsecutiveAttendance(array $attendanceData, string $todayDate): int
+	{
+		$attendanceDateSet = array_flip(array_column($attendanceData, 'regdate'));
+		$currentDate = DateTime::createFromFormat(self::DATE_FORMAT, $todayDate);
 
-    // 2. 기준 날짜로부터 루프를 시작합니다.
-    $consecutiveDays = 0;
-    // DateTime 객체를 사용하여 날짜를 하루씩 쉽게 빼도록 합니다.
-    $currentDate = DateTime::createFromFormat('Ymd', $todayDateString);
+		if (!$currentDate) {
+			return 0;
+		}
 
-    if (!$currentDate) {
-        return 0; // 날짜 형식이 잘못된 경우
-    }
+		$consecutiveDays = 0;
+		while (isset($attendanceDateSet[$currentDate->format(self::DATE_FORMAT)])) {
+			$consecutiveDays++;
+			$currentDate->modify('-1 day');
+		}
 
-    while (true) {
-        // 현재 날짜를 'Ymd' 형식의 문자열로 변환합니다.
-        $dateToCheck = $currentDate->format('Ymd');
-
-        // 4. 출석 기록에 해당 날짜가 있는지 확인합니다.
-        if (isset($attendanceDateSet[$dateToCheck])) {
-            // 출석한 경우: 카운터를 1 증가시키고, 날짜를 하루 전으로 이동합니다.
-            $consecutiveDays++;
-            $currentDate->modify('-1 day');
-        } else {
-            // 출석하지 않은 경우: 루프를 중단합니다.
-            break;
-        }
-    }
-
-    // 5. 계산된 연속 출석 일수를 반환합니다.
-    return $consecutiveDays;
+		return $consecutiveDays;
+	}
 }
