@@ -6,9 +6,11 @@ require 'DiceCalc/CalcSet.php';
 require 'DiceCalc/CalcDice.php';
 require 'DiceCalc/CalcOperation.php';
 require 'DiceCalc/Random.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use Rhymix\Framework\Cache;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 use DiceCalc\Calc as Calc;
 
 /**
@@ -239,5 +241,77 @@ class EventHandlers extends Base
 			return $diceText . ' = ' . $rollResult;
 
 		}, $obj->content);
+	}
+
+	public function beforeInsertFile($obj) {
+		$logged_info = \Context::get('logged_info');
+
+		$ocr = new TesseractOCR($obj->file_info['tmp_name']);
+		try {
+			$text = $ocr->userWords(__DIR__ . '/user-words.txt')->psm(6)->lang('eng', 'kor')->run();
+		} catch (\Exception $e) {
+			return;
+		}
+		if (preg_match('/brrsim\s*[_\-]\s*77/i', $text)) {
+			if($logged_info->is_admin !== 'Y') {
+				$this->_spammerMember($logged_info, 'brrsim_77 이미지', $text);
+				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
+			} else {
+				return new \BaseObject(-1, '[업로드 불가] brrsim_77 이미지');
+			}
+		}
+		if (preg_match('/뽀로로\s*통신/iu', $text)) {
+			if($logged_info->is_admin !== 'Y') {
+				$this->_spammerMember($logged_info, '뽀로로 통신 이미지', $text);
+				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
+			} else {
+				return new \BaseObject(-1, '[업로드 불가] 뽀로로 통신 이미지');
+			}
+		}
+		if (preg_match('/선\s*불\s*유\s*심/iu', $text)) {
+			if($logged_info->is_admin !== 'Y') {
+				$this->_spammerMember($logged_info, '선불유심 이미지', $text);
+				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
+			} else {
+				return new \BaseObject(-1, '[업로드 불가] 선불유심 이미지');
+			}
+		}
+	}
+
+	protected function _spammerMember($logged_info, $description, $text) {
+		if($logged_info->is_admin === 'Y') return;
+
+		$oNcenterliteController = getController('ncenterlite');
+		$oNcenterliteController->sendNotification($logged_info->member_srl, 4, '스팸 이미지 OCR 자동 차단됨 - ' . trim($description), 'https://fanbinit.us/index.php?module=admin&act=dispMemberAdminInsert&member_srl=' . $logged_info->member_srl, $logged_info->member_srl);
+
+		$oMemberController = getController('member');
+		$args = new \stdClass();
+		$args->member_srl = $logged_info->member_srl;
+		$args->email_address = $logged_info->email_address;
+		$args->user_id = $logged_info->user_id;
+		$args->nick_name = $logged_info->nick_name;
+		$args->denied = 'Y';
+		$args->status = 'DENIED';
+		$args->group_srl_list = "1771291";
+		$args->description = trim(vsprintf("%s\n%s [%s %s]\n\n[OCR Result]\n%s", [
+			trim($description),
+			'이미지 OCR 자동 차단',
+			date("Y-m-d H:i:s"),
+			$logged_info->nick_name,
+			trim($text)
+		]));
+
+		$output = executeQuery('member.getMemberInfoByMemberSrl', ['member_srl' => $args->member_srl], ['extra_vars']);
+		$extra_vars = ($output->data && $output->data->extra_vars) ? unserialize($output->data->extra_vars) : new \stdClass();
+		if (!is_object($extra_vars))
+		{
+			$extra_vars = new \stdClass();
+		}
+		$extra_vars->refused_reason = '스팸 이미지 OCR 자동차단. 문의: webmaster@fanbinit.us';
+		$args->extra_vars = serialize($extra_vars);
+
+		$output = $oMemberController->updateMember($args, true, true);
+		\MemberController::clearMemberCache($args->member_srl);
+		\Context::setValidatorMessage('layouts/rx-flextagram', '스팸 이미지 OCR로 자동 차단되었습니다. 문의: webmaster@fanbinit.us', 'error');
 	}
 }

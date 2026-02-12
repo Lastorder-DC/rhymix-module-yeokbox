@@ -20,6 +20,7 @@
 		<eventHandler before="comment.updateComment" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="document.insertDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="document.updateDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
+		<eventHandler before="file.insertFile" class="Controllers\EventHandlers" method="beforeInsertFile" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">

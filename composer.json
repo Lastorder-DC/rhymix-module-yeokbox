@@ -1,0 +1,14 @@
+{
+    "name": "fanbinit/yeokbox",
+    "type": "project",
+    "require": {
+        "thiagoalessio/tesseract_ocr": "^2.13",
+	"rhymix/composer-stub": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Lastorder-DC",
+            "email": "18280396+Lastorder-DC@users.noreply.github.com"
+        }
+    ]
+}
