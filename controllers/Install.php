@@ -2,6 +2,8 @@
 
 namespace Rhymix\Modules\Yeokbox\Controllers;
 
+use DB;
+
 /**
  * 역박스 커스텀
  * 
@@ -28,7 +30,10 @@ class Install extends Base
 	 */
 	public function checkUpdate()
 	{
-
+		$oDB = DB::getInstance();
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_member_srl')) return true;
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_nick_name')) return true;
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_content')) return true;
 	}
 	
 	/**
@@ -38,7 +43,19 @@ class Install extends Base
 	 */
 	public function moduleUpdate()
 	{
-		
+		$oDB = DB::getInstance();
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_member_srl'))
+		{
+			$oDB->addColumn('yeokbox_pick_log', 'comment_member_srl', 'number', 11, null, true);
+		}
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_nick_name'))
+		{
+			$oDB->addColumn('yeokbox_pick_log', 'comment_nick_name', 'varchar', 80, null, true);
+		}
+		if (!$oDB->isColumnExists('yeokbox_pick_log', 'comment_content'))
+		{
+			$oDB->addColumn('yeokbox_pick_log', 'comment_content', 'text', null, null, true);
+		}
 	}
 	
 	/**

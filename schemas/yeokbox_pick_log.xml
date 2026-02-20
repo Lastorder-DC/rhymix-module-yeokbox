@@ -3,5 +3,8 @@
 	<column name="document_srl" type="number" size="11" notnull="notnull" index="idx_document_srl" />
 	<column name="comment_srl" type="number" size="11" notnull="notnull" index="idx_comment_srl" />
 	<column name="member_srl" type="number" size="11" notnull="notnull" index="idx_member_srl" />
+	<column name="comment_member_srl" type="number" size="11" />
+	<column name="comment_nick_name" type="varchar" size="80" />
+	<column name="comment_content" type="text" />
 	<column name="regdate" type="date" />
 </table>
