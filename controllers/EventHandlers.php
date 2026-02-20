@@ -370,5 +370,6 @@ class EventHandlers extends Base
 	{
 		$oMemberController = memberController::getInstance();
 		$oMemberController->addMemberMenu('dispYeokboxPickLog', '댓글 추첨 기록');
+		$oMemberController->addMemberMenu('dispYeokboxPickInfo', '댓글 추첨 정보 확인');
  	}
 }
