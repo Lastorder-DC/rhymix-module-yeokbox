@@ -7,7 +7,9 @@
 		<action name="procYeokboxAdminInsertConfig" class="Controllers\Admin" />
 		<action name="procYeokboxAdminFixAttendance" class="Controllers\Admin" />
 		<action name="procYeokboxPickComment" class="Controllers\CommentFunc" />
+		<action name="procYeokboxGetPickInfo" class="Controllers\CommentFunc" type="controller" />
 		<action name="dispYeokboxPickLog" class="Controllers\CommentFunc" type="view" standalone="true" />
+		<action name="dispYeokboxPickInfo" class="Controllers\CommentFunc" type="view" standalone="true" />
 		<action name="procYeokboxBumpDocument" class="Controllers\DocumentFunc" />
 		<action name="procYeokboxMoveCategoryBulk" class="Controllers\DocumentFunc" />
 	</actions>

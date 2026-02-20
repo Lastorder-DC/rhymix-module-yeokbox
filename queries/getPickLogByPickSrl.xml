@@ -1,0 +1,11 @@
+<query id="getPickLogByPickSrl" action="select">
+	<tables>
+		<table name="yeokbox_pick_log" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="pick_srl" var="pick_srl" filter="number" notnull="notnull" />
+	</conditions>
+</query>
