@@ -51,6 +51,7 @@ class CommentFunc extends Base
 		$log->document_srl = $target_srl;
 		$log->comment_srl = intval($picked->comment_srl);
 		$log->member_srl = intval($logged_info->member_srl);
+		$log->regdate = date('YmdHis');
 		executeQuery('yeokbox.insertPickLog', $log);
 
 		// 당첨 결과 반환
