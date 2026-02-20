@@ -50,6 +50,9 @@ class CommentFunc extends Base
 		$log->document_srl = $target_srl;
 		$log->comment_srl = intval($picked->comment_srl);
 		$log->member_srl = intval($logged_info->member_srl);
+		$log->comment_member_srl = intval($picked->member_srl);
+		$log->comment_nick_name = $picked->nick_name;
+		$log->comment_content = $picked->content;
 		$log->regdate = date('YmdHis');
 		executeQuery('yeokbox.insertPickLog', $log);
 
@@ -61,6 +64,7 @@ class CommentFunc extends Base
 		$result->regdate = $picked->regdate;
 		$result->total_comments = count($comment_list);
 		$result->pick_srl = $pick_srl;
+		$result->pick_log_url = getUrl('', 'act', 'dispYeokboxPickLog');
 
 		$this->add('picked_comment', $result);
 	}

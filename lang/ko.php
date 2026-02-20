@@ -15,5 +15,7 @@ $lang->cmd_pick_log_title = '추첨 기록';
 $lang->cmd_pick_srl = '추첨 번호';
 $lang->cmd_pick_document = '게시글';
 $lang->cmd_pick_comment = '당첨 댓글';
+$lang->cmd_pick_comment_author = '댓글 작성자';
+$lang->cmd_pick_comment_content = '댓글 내용';
 $lang->cmd_pick_date = '추첨 일시';
 $lang->msg_no_pick_log = '추첨 기록이 없습니다.';
