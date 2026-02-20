@@ -205,7 +205,7 @@ class EventHandlers extends Base
 			return;
 		}
 
-		$oNcenterliteController = getController('ncenterlite');
+		$oNcenterliteController = ncenterliteController::getInstance();
 		$baseMessage = $nick . " 새 글 알림! - " . $obj->title;
 		$targetUrl = "/" . $obj->document_srl;
 
@@ -329,10 +329,10 @@ class EventHandlers extends Base
 		if($logged_info->is_admin === 'Y') return;
 		if(!$logged_info->member_srl) return;
 
-		$oNcenterliteController = getController('ncenterlite');
+		$oNcenterliteController = ncenterliteController::getInstance();
 		$oNcenterliteController->sendNotification($logged_info->member_srl, 4, '스팸 이미지 OCR 자동 차단됨 - ' . trim($description), 'https://fanbinit.us/index.php?module=admin&act=dispMemberAdminInsert&member_srl=' . $logged_info->member_srl, $logged_info->member_srl);
 
-		$oMemberController = getController('member');
+		$oMemberController = memberController::getInstance();
 		$args = new \stdClass();
 		$args->member_srl = $logged_info->member_srl;
 		$args->email_address = $logged_info->email_address;
@@ -368,7 +368,7 @@ class EventHandlers extends Base
 	 */
 	public function triggerAddMemberMenu($oModule)
 	{
-		$oMemberController = getController('member');
+		$oMemberController = memberController::getInstance();
 		$oMemberController->addMemberMenu('dispYeokboxPickLog', '댓글 추첨 기록');
  	}
 }

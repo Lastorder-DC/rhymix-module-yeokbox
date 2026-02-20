@@ -142,7 +142,7 @@ class DocumentFunc extends Base
 			return new BaseObject(-1, '오류가 발생하여 작업을 취소했습니다: ' . $e->getMessage());
 		}
 
-		$oDocumentController = getController('document');
+		$oDocumentController = documentController::getInstance();
 		$oDocumentController->updateCategoryCount($moduleSrl, $sourceCategorySrl);
 		$oDocumentController->updateCategoryCount($moduleSrl, $targetCategorySrl);
 
