@@ -10,6 +10,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use Rhymix\Framework\Cache;
+use Rhymix\Framework\Lang;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use DiceCalc\Calc as Calc;
 
@@ -128,6 +129,11 @@ class EventHandlers extends Base
 		}
 	}
 
+	/**
+	 * 추천 수 업데이트 후 트리거
+	 * 
+	 * @param object $obj
+	 */
 	public function afterUpdateVotedCount($obj) {
 		$config = ConfigModel::getConfig();
 		if ($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
@@ -137,6 +143,11 @@ class EventHandlers extends Base
 		$this->updateVoteCache($obj, "Y");
 	}
 
+	/**
+	 * 추천 취소 후 트리거
+	 * 
+	 * @param object $obj
+	 */
 	public function afterUpdateVotedCountCancel($obj) {
 		$config = ConfigModel::getConfig();
 		if ($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
@@ -146,6 +157,12 @@ class EventHandlers extends Base
 		$this->updateVoteCache($obj, "N");
 	}
 	
+	/**
+	 * 추천 캐시 업데이트
+	 * 
+	 * @param object $obj
+	 * @param string $vote
+	 */
 	public function updateVoteCache($obj, $vote) {
 		$config = ConfigModel::getConfig();
 		$cacheKey = 'yeokbox_vote_' . $config->yeokka_member_srl;
@@ -160,6 +177,11 @@ class EventHandlers extends Base
 		}
 	}
 
+	/**
+	 * 새 글 알림 발송 (큐 작업용)
+	 * 
+	 * @param object $obj
+	 */
 	public static function sendNewDocNotification($obj) {
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
@@ -195,6 +217,11 @@ class EventHandlers extends Base
 		}
 	}
 
+	/**
+	 * 글 등록 후 트리거
+	 * 
+	 * @param object $obj
+	 */
 	public function afterPublishDocument($obj) {
 		// 현재 설정 상태 불러오기
 		$config = ConfigModel::getConfig();
@@ -210,7 +237,14 @@ class EventHandlers extends Base
 		}
 	}
 
+	/**
+	 * 내용 입력 전 트리거 (다이스 롤링 처리)
+	 * 
+	 * @param object $obj
+	 */
 	public function beforeInsertContent(&$obj) {
+		if($obj->document_srl == 1264782) return; // 공지글은 롤링 안함
+
 		// 댓글 내용에서 {문자} 형태의 문자열을 찾아서 다이스 롤링
 		$pattern = '/\{([^{}]+)\}/';
 		
@@ -243,6 +277,12 @@ class EventHandlers extends Base
 		}, $obj->content);
 	}
 
+	/**
+	 * 파일 첨부 전 트리거 (OCR 스팸 감지)
+	 * 
+	 * @param object $obj
+	 * @return BaseObject|void
+	 */
 	public function beforeInsertFile($obj) {
 		$logged_info = \Context::get('logged_info');
 
@@ -278,8 +318,16 @@ class EventHandlers extends Base
 		}
 	}
 
+	/**
+	 * 스팸 회원 처리
+	 * 
+	 * @param object $logged_info
+	 * @param string $description
+	 * @param string $text
+	 */
 	protected function _spammerMember($logged_info, $description, $text) {
 		if($logged_info->is_admin === 'Y') return;
+		if(!$logged_info->member_srl) return;
 
 		$oNcenterliteController = getController('ncenterlite');
 		$oNcenterliteController->sendNotification($logged_info->member_srl, 4, '스팸 이미지 OCR 자동 차단됨 - ' . trim($description), 'https://fanbinit.us/index.php?module=admin&act=dispMemberAdminInsert&member_srl=' . $logged_info->member_srl, $logged_info->member_srl);
@@ -313,5 +361,33 @@ class EventHandlers extends Base
 		$output = $oMemberController->updateMember($args, true, true);
 		\MemberController::clearMemberCache($args->member_srl);
 		\Context::setValidatorMessage('layouts/rx-flextagram', '스팸 이미지 OCR로 자동 차단되었습니다. 문의: webmaster@fanbinit.us', 'error');
+	}
+
+	/**
+	 * 모듈 동작 후 트리거 (신고 사유 설정)
+	 */
+	public function afterModuleProc()
+	{
+		/*
+		$oLang = Lang::getInstance('ko');
+
+		$declare_list = [
+			'1. 싸우지 마세요 위반',
+			'2. 후방글에는 반드시 후방 주의를 달아주세요 위반',
+			'3. 스포글에도 반드시 스포 주의 달아주세요 위반',
+			'4. 타스 내수용 수출',
+			'5. 타스 비방/욕설',
+			'6. 광고/스팸글'
+		];
+
+		$list = [];
+		foreach ($declare_list as $reason) {
+			$list[$reason] = $reason;
+		}
+		$list['others'] = '7. 기타(직접 작성)';
+
+		$oLang->set('improper_document_reasons', $list);
+		$oLang->set('improper_comment_reasons', $list);
+		*/
 	}
 }

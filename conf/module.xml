@@ -22,6 +22,7 @@
 		<eventHandler before="document.insertDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="document.updateDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="file.insertFile" class="Controllers\EventHandlers" method="beforeInsertFile" />
+		<eventHandler after="moduleHandler.proc" class="Controllers\EventHandlers" method="afterModuleProc" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">
