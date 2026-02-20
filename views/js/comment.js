@@ -9,16 +9,15 @@ function pickRandomComment(doc_srl) {
 			alert(response.message);
 			return;
 		}
-		// response.comment_list중 랜덤한 댓글 1개 선택
-		let comment_list = response.comment_list;
-		if (comment_list.length === 0) {
-			alert('댓글이 없습니다.');
+
+		let picked = response.picked_comment;
+		if (!picked) {
+			alert('추첨 결과가 없습니다.');
 			return;
 		}
-		let random_index = Math.floor(Math.random() * comment_list.length);
-		let random_comment = comment_list[random_index];
-		// 20250827121634 형태의 random_comment.regdate를 YYYY-MM-DD HH:MM:SS 형태로 변환
-		random_comment.regdate = random_comment.regdate.replace(
+
+		// 20250827121634 형태의 regdate를 YYYY-MM-DD HH:MM:SS 형태로 변환
+		picked.regdate = picked.regdate.replace(
 			/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/,
 			'$1-$2-$3 $4:$5:$6'
 		);
@@ -26,10 +25,12 @@ function pickRandomComment(doc_srl) {
 		let result_div = document.querySelector('.randCommentResult');
 		result_div.innerHTML = `
 			<p><strong>축하합니다! 당첨된 댓글입니다!</strong></p>
-			<p>작성자: ${random_comment.nick_name}</p>
-			<p>내용: ${random_comment.content}</p>
-			<p>작성일: ${random_comment.regdate}</p>
-			<p>링크 : <u><a href="${current_url}&comment_srl=${random_comment.comment_srl}#comment_${random_comment.comment_srl}" target="_blank">바로가기</a></u></p>
+			<p>작성자: ${picked.nick_name}</p>
+			<p>내용: ${picked.content}</p>
+			<p>작성일: ${picked.regdate}</p>
+			<p>전체 댓글 수: ${picked.total_comments}개 중 서버 추첨</p>
+			<p>추첨 번호: ${picked.pick_srl}</p>
+			<p>링크 : <u><a href="${current_url}&comment_srl=${picked.comment_srl}#comment_${picked.comment_srl}" target="_blank">바로가기</a></u></p>
 		`;
 	});
 }

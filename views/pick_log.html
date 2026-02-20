@@ -1,0 +1,41 @@
+<div class="pick-log-wrap">
+	<h2>{$lang->cmd_pick_log_title}</h2>
+
+	<block cond="$pick_logs && count($pick_logs)">
+		<table class="pick-log-table">
+			<thead>
+				<tr>
+					<th>{$lang->cmd_pick_srl}</th>
+					<th>{$lang->cmd_pick_document}</th>
+					<th>{$lang->cmd_pick_comment}</th>
+					<th>{$lang->cmd_pick_date}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr loop="$pick_logs => $log">
+					<td>{$log->pick_srl}</td>
+					<td><a href="{getUrl('','document_srl',$log->document_srl)}">{$log->document_srl}</a></td>
+					<td><a href="{getUrl('','document_srl',$log->document_srl,'comment_srl',$log->comment_srl)}#comment_{$log->comment_srl}">{$log->comment_srl}</a></td>
+					<td>{$log->regdate|date_format:'Y-m-d H:i:s'}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<block cond="$page_navigation">
+			<div class="pick-log-pagination">
+				<a cond="$page_navigation->first_page < $page" href="{getUrl('page', 1)}">&laquo;</a>
+				<a cond="$page_navigation->prev_page > 0" href="{getUrl('page', $page_navigation->prev_page)}">&lsaquo;</a>
+				<loop var="$page_navigation->getNextPage()" key="$k" value="$v">
+					<strong cond="$v == $page">{$v}</strong>
+					<a cond="$v != $page" href="{getUrl('page', $v)}">{$v}</a>
+				</loop>
+				<a cond="$page_navigation->next_page > 0" href="{getUrl('page', $page_navigation->next_page)}">&rsaquo;</a>
+				<a cond="$page_navigation->last_page > $page" href="{getUrl('page', $page_navigation->last_page)}">&raquo;</a>
+			</div>
+		</block>
+	</block>
+
+	<block cond="!$pick_logs || !count($pick_logs)">
+		<p>{$lang->msg_no_pick_log}</p>
+	</block>
+</div>

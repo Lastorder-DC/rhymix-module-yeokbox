@@ -1,0 +1,16 @@
+<table name="yeokbox_pick_log">
+	<column name="pick_srl" type="number" size="11" notnull="notnull" primary_key="primary_key" />
+	<column name="document_srl" type="number" size="11" notnull="notnull" />
+	<column name="comment_srl" type="number" size="11" notnull="notnull" />
+	<column name="member_srl" type="number" size="11" notnull="notnull" />
+	<column name="regdate" type="date" />
+	<index name="idx_document_srl">
+		<column name="document_srl" order="asc" />
+	</index>
+	<index name="idx_member_srl">
+		<column name="member_srl" order="asc" />
+	</index>
+	<index name="idx_comment_srl">
+		<column name="comment_srl" order="asc" />
+	</index>
+</table>
