@@ -30,7 +30,9 @@ function getPickInfo() {
 		document.getElementById('result_pick_srl').textContent = info.pick_srl;
 
 		var docLink = document.createElement('a');
-		docLink.href = request_uri + '?document_srl=' + encodeURIComponent(info.document_srl);
+		var docUrl = new URL(request_uri, window.location.origin);
+		docUrl.searchParams.set('document_srl', info.document_srl);
+		docLink.href = docUrl.pathname + docUrl.search;
 		docLink.textContent = info.document_srl;
 		var docCell = document.getElementById('result_document_srl');
 		docCell.textContent = '';
