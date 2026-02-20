@@ -126,7 +126,7 @@ class Admin extends Base
 			$consecutive_days = $this->calculateConsecutiveAttendance($output->data, $today);
 
 			// DB상 연속 출석일을 가져옴
-			$oAttendanceModel = attendanceModel::getInstance();
+			$oAttendanceModel = \attendanceModel::getInstance();
 			$data = $oAttendanceModel->getContinuityDataByMemberSrl($member_srl, $today);
 			if ($data->continuity >= $consecutive_days) {
 				// 이미 연속 출석 일수가 같거나 크면 다음 회원으로 넘어감
@@ -145,7 +145,7 @@ class Admin extends Base
 				continue;
 			}
 
-			$oAttendanceModel = attendanceModel::getInstance();
+			$oAttendanceModel = \attendanceModel::getInstance();
 			$oAttendanceModel->clearCacheByMemberSrl($member_srl);
 		}
 
