@@ -94,4 +94,32 @@ class CommentFunc extends Base
 		$this->setTemplatePath($this->module_path . 'views');
 		$this->setTemplateFile('pick_log');
 	}
+
+	public static function filterCommentContent($content, $default_content = '')
+	{
+		// Remove tags
+		$content = preg_replace('!(</p|</div|<br)!i', ' $1', $content);
+		$content = strip_tags($content);
+
+		// Convert temporarily html entity for truncate
+		$content = html_entity_decode($content, ENT_QUOTES);
+
+		// Replace all whitespaces to single space
+		$content = utf8_trim(utf8_normalize_spaces($content));
+
+		// Escape string
+		$content = escape($content, false);
+
+		if ($content === '')
+		{
+			return $default_content;
+		}
+
+		if ($content === '0')
+		{
+			return '0';
+		}
+
+		return $content;
+	}
 }

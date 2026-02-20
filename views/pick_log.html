@@ -10,9 +10,8 @@
 				<tr>
 					<th>{$lang->cmd_pick_srl}</th>
 					<th>{$lang->cmd_pick_document}</th>
-					<th>{$lang->cmd_pick_comment}</th>
 					<th>{$lang->cmd_pick_comment_author}</th>
-					<th>{$lang->cmd_pick_comment_content}</th>
+					<th>{$lang->cmd_pick_comment}</th>
 					<th>{$lang->cmd_pick_date}</th>
 				</tr>
 			</thead>
@@ -20,10 +19,9 @@
 				<tr loop="$pick_logs => $log">
 					<td>{$log->pick_srl}</td>
 					<td><a href="{getUrl('','document_srl',$log->document_srl)}">{$log->document_srl}</a></td>
-					<td><a href="{getUrl('','document_srl',$log->document_srl,'comment_srl',$log->comment_srl)}#comment_{$log->comment_srl}">{$log->comment_srl}</a></td>
 					<td>{$log->comment_nick_name|escape}</td>
-					<td>{$log->comment_content|escape}</td>
-					<td>{$log->regdate|date_format:'Y-m-d H:i:s'}</td>
+					<td><a href="{getUrl('','document_srl',$log->document_srl,'comment_srl',$log->comment_srl)}#comment_{$log->comment_srl}">{@ echo Rhymix\Modules\Yeokbox\Controllers\CommentFunc::filterCommentContent($log->comment_content, lang('comment.msg_no_text_comment')); }</a></td>
+					<td>{$log->regdate|date}</td>
 				</tr>
 			</tbody>
 		</table>

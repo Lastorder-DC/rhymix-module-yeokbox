@@ -369,6 +369,6 @@ class EventHandlers extends Base
 	public function triggerAddMemberMenu($oModule)
 	{
 		$oMemberController = getController('member');
-		$oMemberController->addMemberMenu('dispYeokboxPickLog', '내 댓글 추첨 목록');
+		$oMemberController->addMemberMenu('dispYeokboxPickLog', '댓글 추첨 기록');
  	}
 }
