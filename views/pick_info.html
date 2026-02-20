@@ -1,0 +1,51 @@
+<load target="../../member/skins/default/css/member.css" />
+<load target="js/pick_info.js" />
+<include target="../../member/skins/default/common_header.html" />
+
+<div class="xm">
+	<h1>{$lang->cmd_pick_info_title}</h1>
+
+	<div class="pick-info-search">
+		<div class="input-group" style="max-width:400px;">
+			<input type="number" id="pick_srl_input" class="form-control" placeholder="{$lang->cmd_pick_srl}" />
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-primary" onclick="getPickInfo()">{$lang->cmd_pick_info_search}</button>
+			</span>
+		</div>
+	</div>
+
+	<div id="pickInfoResult" style="margin-top:20px; display:none;">
+		<table class="table table-striped">
+			<tbody>
+				<tr>
+					<th style="width:150px;">{$lang->cmd_pick_srl}</th>
+					<td id="result_pick_srl"></td>
+				</tr>
+				<tr>
+					<th>{$lang->cmd_pick_document}</th>
+					<td id="result_document_srl"></td>
+				</tr>
+				<tr>
+					<th>{$lang->cmd_pick_member}</th>
+					<td id="result_picker_nick_name"></td>
+				</tr>
+				<tr>
+					<th>{$lang->cmd_pick_comment_author}</th>
+					<td id="result_comment_nick_name"></td>
+				</tr>
+				<tr>
+					<th>{$lang->cmd_pick_comment_content}</th>
+					<td id="result_comment_content"></td>
+				</tr>
+				<tr>
+					<th>{$lang->cmd_pick_date}</th>
+					<td id="result_regdate"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div id="pickInfoError" style="margin-top:20px; display:none;">
+		<p id="pickInfoErrorMsg"></p>
+	</div>
+</div>

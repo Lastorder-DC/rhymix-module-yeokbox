@@ -19,3 +19,6 @@ $lang->cmd_pick_comment_author = '댓글 작성자';
 $lang->cmd_pick_comment_content = '댓글 내용';
 $lang->cmd_pick_date = '추첨 일시';
 $lang->msg_no_pick_log = '추첨 기록이 없습니다.';
+$lang->cmd_pick_info_title = '추첨 정보 조회';
+$lang->cmd_pick_info_search = '조회';
+$lang->cmd_pick_member = '추첨 진행자';
