@@ -21,8 +21,8 @@
 					<td>{$log->pick_srl}</td>
 					<td><a href="{getUrl('','document_srl',$log->document_srl)}">{$log->document_srl}</a></td>
 					<td><a href="{getUrl('','document_srl',$log->document_srl,'comment_srl',$log->comment_srl)}#comment_{$log->comment_srl}">{$log->comment_srl}</a></td>
-					<td>{$log->comment_nick_name}</td>
-					<td>{$log->comment_content}</td>
+					<td>{$log->comment_nick_name|escape}</td>
+					<td>{$log->comment_content|escape}</td>
 					<td>{$log->regdate|date_format:'Y-m-d H:i:s'}</td>
 				</tr>
 			</tbody>
