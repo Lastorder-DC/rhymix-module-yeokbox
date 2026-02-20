@@ -2,7 +2,6 @@
 
 namespace Rhymix\Modules\Yeokbox\Controllers;
 
-use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use BaseObject;
 use Context;
 
@@ -88,6 +87,7 @@ class CommentFunc extends Base
 		Context::set('page', $output->page);
 		Context::set('page_navigation', $output->page_navigation);
 
+		$this->setTemplatePath($this->module_path . 'views');
 		$this->setTemplateFile('pick_log');
 	}
 }

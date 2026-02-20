@@ -7,7 +7,7 @@
 		<action name="procYeokboxAdminInsertConfig" class="Controllers\Admin" />
 		<action name="procYeokboxAdminFixAttendance" class="Controllers\Admin" />
 		<action name="procYeokboxPickComment" class="Controllers\CommentFunc" />
-		<action name="dispYeokboxPickLog" class="Controllers\CommentFunc" />
+		<action name="dispYeokboxPickLog" class="Controllers\CommentFunc" type="view" standalone="true" />
 		<action name="procYeokboxBumpDocument" class="Controllers\DocumentFunc" />
 		<action name="procYeokboxMoveCategoryBulk" class="Controllers\DocumentFunc" />
 	</actions>
@@ -22,11 +22,11 @@
 		<eventHandler before="document.insertDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="document.updateDocument" class="Controllers\EventHandlers" method="beforeInsertContent" />
 		<eventHandler before="file.insertFile" class="Controllers\EventHandlers" method="beforeInsertFile" />
-		<eventHandler after="moduleHandler.proc" class="Controllers\EventHandlers" method="afterModuleProc" />
+		<eventHandler before="moduleHandler.init" class="Controllers\EventHandlers" method="triggerAddMemberMenu" />
 	</eventHandlers>
 	<menus>
 		<menu name="yeokbox" type="all">
-			<title xml:lang="ko">역박스 커스텀</title>
+			<title xml:lang="ko">팬비닛 커스텀</title>
 		</menu>
 	</menus>
 </module>

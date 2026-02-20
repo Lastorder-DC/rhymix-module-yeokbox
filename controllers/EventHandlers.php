@@ -366,28 +366,9 @@ class EventHandlers extends Base
 	/**
 	 * 모듈 동작 후 트리거 (신고 사유 설정)
 	 */
-	public function afterModuleProc()
+	public function triggerAddMemberMenu($oModule)
 	{
-		/*
-		$oLang = Lang::getInstance('ko');
-
-		$declare_list = [
-			'1. 싸우지 마세요 위반',
-			'2. 후방글에는 반드시 후방 주의를 달아주세요 위반',
-			'3. 스포글에도 반드시 스포 주의 달아주세요 위반',
-			'4. 타스 내수용 수출',
-			'5. 타스 비방/욕설',
-			'6. 광고/스팸글'
-		];
-
-		$list = [];
-		foreach ($declare_list as $reason) {
-			$list[$reason] = $reason;
-		}
-		$list['others'] = '7. 기타(직접 작성)';
-
-		$oLang->set('improper_document_reasons', $list);
-		$oLang->set('improper_comment_reasons', $list);
-		*/
-	}
+		$oMemberController = getController('member');
+		$oMemberController->addMemberMenu('dispYeokboxPickLog', '내 댓글 추첨 목록');
+ 	}
 }
