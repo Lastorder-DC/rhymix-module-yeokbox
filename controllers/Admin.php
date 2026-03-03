@@ -6,6 +6,9 @@ use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use BaseObject;
 use Context;
 use DateTime;
+use MemberModel;
+use stdClass;
+use attendanceModel;
 
 /**
  * 역박스 커스텀
@@ -58,7 +61,7 @@ class Admin extends Base
 		$yeokka_member_srl = intval($vars->yeokka_member_srl);
 		
 		// 제출받은 데이터를 각각 적절히 필터링하여 설정 변경
-		if (!\MemberModel::getMemberInfoByMemberSrl($yeokka_member_srl))
+		if (!MemberModel::getMemberInfoByMemberSrl($yeokka_member_srl))
 		{
 			return new BaseObject(-1, 'msg_yeokbox_invalid_member_srl');
 		}
@@ -92,7 +95,7 @@ class Admin extends Base
 		$today = date(self::DATE_FORMAT);
 
 		// member 모듈의 getMembers 쿼리 호출
-		$args = new \stdClass();
+		$args = new stdClass();
 		$output = executeQueryArray('member.getMembers', $args);
 		if (!$output->toBool()) {
 			return $output;
@@ -103,7 +106,7 @@ class Admin extends Base
 
 		// 모든 회원에 대해 연속 출석 일수 재계산
 		foreach ($member_list as $member_srl) {
-			$args = new \stdClass();
+			$args = new stdClass();
 			$args->member_srl = $member_srl;
 			$output = executeQueryArray('attendance.getAttendanceDataMemberSrl', $args);
 
@@ -126,7 +129,7 @@ class Admin extends Base
 			$consecutive_days = $this->calculateConsecutiveAttendance($output->data, $today);
 
 			// DB상 연속 출석일을 가져옴
-			$oAttendanceModel = \attendanceModel::getInstance();
+			$oAttendanceModel = attendanceModel::getInstance();
 			$data = $oAttendanceModel->getContinuityDataByMemberSrl($member_srl, $today);
 			if ($data->continuity >= $consecutive_days) {
 				// 이미 연속 출석 일수가 같거나 크면 다음 회원으로 넘어감
@@ -136,7 +139,7 @@ class Admin extends Base
 			$debugArray['att_' . $member_srl] = $data->continuity . '->' . $consecutive_days;
 
 			// 연속 출석 일수 업데이트
-			$args = new \stdClass();
+			$args = new stdClass();
 			$args->member_srl = $member_srl;
 			$args->continuity = $consecutive_days;
 			$args->regdate = $today . '235959';
@@ -145,7 +148,7 @@ class Admin extends Base
 				continue;
 			}
 
-			$oAttendanceModel = \attendanceModel::getInstance();
+			$oAttendanceModel = attendanceModel::getInstance();
 			$oAttendanceModel->clearCacheByMemberSrl($member_srl);
 		}
 

@@ -10,9 +10,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Rhymix\Modules\Yeokbox\Models\Config as ConfigModel;
 use Rhymix\Framework\Cache;
-use Rhymix\Framework\Lang;
 use thiagoalessio\TesseractOCR\TesseractOCR;
 use DiceCalc\Calc as Calc;
+use BaseObject;
+use Context;
+use Exception;
+use MemberController;
+use MemberModel;
+use ncenterliteController;
+use Rhymix\Framework\Queue;
+use stdClass;
 
 /**
  * 역박스 커스텀
@@ -57,7 +64,7 @@ class EventHandlers extends Base
 			$chzzk_attach = true;
 		}
 
-		$badgeInfo = new \stdClass();
+		$badgeInfo = new stdClass();
 		$badgeInfo->image_attach = $image_attach;
 		$badgeInfo->video_attach = $video_attach;
 		$badgeInfo->youtube_attach = $youtube_attach;
@@ -90,7 +97,7 @@ class EventHandlers extends Base
 			$docSrl = $doc->get('document_srl');
 
 			if (!isset($voteData[$docSrl])) {
-				$args = new \stdClass();
+				$args = new stdClass();
 				$args->member_srl = $config->yeokka_member_srl;
 				$args->document_srl = $docSrl;
 				$output = executeQuery('document.getDocumentVotedLogInfo', $args);
@@ -136,7 +143,7 @@ class EventHandlers extends Base
 	 */
 	public function afterUpdateVotedCount($obj) {
 		$config = ConfigModel::getConfig();
-		if ($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
+		if ($config->yeokka_member_srl != MemberModel::getLoggedMemberSrl()) {
 			return;
 		}
 
@@ -150,7 +157,7 @@ class EventHandlers extends Base
 	 */
 	public function afterUpdateVotedCountCancel($obj) {
 		$config = ConfigModel::getConfig();
-		if ($config->yeokka_member_srl != \MemberModel::getLoggedMemberSrl()) {
+		if ($config->yeokka_member_srl != MemberModel::getLoggedMemberSrl()) {
 			return;
 		}
 
@@ -197,7 +204,7 @@ class EventHandlers extends Base
 			return;
 		}
 
-		$args = new \stdClass();
+		$args = new stdClass();
 		$args->member_srl = $objMemberSrl;
 		$output = executeQueryArray('yeokbox.getFriendList', $args, ['member.member_srl', 'nick_name']);
 
@@ -205,12 +212,12 @@ class EventHandlers extends Base
 			return;
 		}
 
-		$oNcenterliteController = \ncenterliteController::getInstance();
+		$oNcenterliteController = ncenterliteController::getInstance();
 		$baseMessage = $nick . " 새 글 알림! - " . $obj->title;
 		$targetUrl = "/" . $obj->document_srl;
 
 		foreach($output->data as $friend) {
-			$message = new \stdClass();
+			$message = new stdClass();
 			$message->summary = $baseMessage;
 			$message->subject = $baseMessage;
 			$oNcenterliteController->sendNotification(4, $friend->member_srl, $message, $targetUrl, $obj->document_srl);
@@ -233,7 +240,7 @@ class EventHandlers extends Base
 		}
 
 		if (config('queue.enabled') && !defined('RXQUEUE_CRON')) {
-			\Rhymix\Framework\Queue::addTask(self::class . '::' . 'sendNewDocNotification', $obj);
+			Queue::addTask(self::class . '::' . 'sendNewDocNotification', $obj);
 		}
 	}
 
@@ -256,7 +263,7 @@ class EventHandlers extends Base
 				$calc = new Calc($expression);
 				$diceText = $calc->infix();
 				$rollResult = $calc();
-			} catch (\Exception $e) {
+			} catch (Exception $e) {
 				// 계산식이 잘못된 경우 원래 문자열 유지
 				return $originalRollString;
 			}
@@ -284,38 +291,44 @@ class EventHandlers extends Base
 	 * @return BaseObject|void
 	 */
 	public function beforeInsertFile($obj) {
-		$logged_info = \Context::get('logged_info');
+		$logged_info = Context::get('logged_info');
 
 		$ocr = new TesseractOCR($obj->file_info['tmp_name']);
 		try {
 			$text = $ocr->userWords(__DIR__ . '/user-words.txt')->psm(6)->lang('eng', 'kor')->run();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			return;
 		}
-		if (preg_match('/brrsim\s*[_\-]\s*77/i', $text)) {
-			if($logged_info->is_admin !== 'Y') {
-				$this->_spammerMember($logged_info, 'brrsim_77 이미지', $text);
-				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
-			} else {
-				return new \BaseObject(-1, '[업로드 불가] brrsim_77 이미지');
+		
+		return $this->_checkSpamPatterns($text, $logged_info);
+	}
+
+	/**
+	 * OCR 텍스트에서 스팸 패턴 검사
+	 * 
+	 * @param string $text
+	 * @param object $logged_info
+	 * @return BaseObject|null
+	 */
+	private function _checkSpamPatterns($text, $logged_info) {
+		$patterns = [
+			'/brrsim\s*[_\-]\s*77/i' => 'brrsim_77 이미지',
+			'/뽀로로\s*통신/iu' => '뽀로로 통신 이미지',
+			'/선\s*불\s*유\s*심/iu' => '선불유심 이미지',
+		];
+
+		foreach ($patterns as $pattern => $name) {
+			if (preg_match($pattern, $text)) {
+				if ($logged_info->is_admin !== 'Y') {
+					$this->_spammerMember($logged_info, $name, $text);
+					return new BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
+				} else {
+					return new BaseObject(-1, '[업로드 불가] ' . $name);
+				}
 			}
 		}
-		if (preg_match('/뽀로로\s*통신/iu', $text)) {
-			if($logged_info->is_admin !== 'Y') {
-				$this->_spammerMember($logged_info, '뽀로로 통신 이미지', $text);
-				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
-			} else {
-				return new \BaseObject(-1, '[업로드 불가] 뽀로로 통신 이미지');
-			}
-		}
-		if (preg_match('/선\s*불\s*유\s*심/iu', $text)) {
-			if($logged_info->is_admin !== 'Y') {
-				$this->_spammerMember($logged_info, '선불유심 이미지', $text);
-				return new \BaseObject(-1, '서버 오류로 첨부할 수 없습니다.');
-			} else {
-				return new \BaseObject(-1, '[업로드 불가] 선불유심 이미지');
-			}
-		}
+		
+		return null;
 	}
 
 	/**
@@ -329,11 +342,11 @@ class EventHandlers extends Base
 		if($logged_info->is_admin === 'Y') return;
 		if(!$logged_info->member_srl) return;
 
-		$oNcenterliteController = \ncenterliteController::getInstance();
+		$oNcenterliteController = ncenterliteController::getInstance();
 		$oNcenterliteController->sendNotification($logged_info->member_srl, 4, '스팸 이미지 OCR 자동 차단됨 - ' . trim($description), 'https://fanbinit.us/index.php?module=admin&act=dispMemberAdminInsert&member_srl=' . $logged_info->member_srl, $logged_info->member_srl);
 
-		$oMemberController = \memberController::getInstance();
-		$args = new \stdClass();
+		$oMemberController = MemberController::getInstance();
+		$args = new stdClass();
 		$args->member_srl = $logged_info->member_srl;
 		$args->email_address = $logged_info->email_address;
 		$args->user_id = $logged_info->user_id;
@@ -350,17 +363,17 @@ class EventHandlers extends Base
 		]));
 
 		$output = executeQuery('member.getMemberInfoByMemberSrl', ['member_srl' => $args->member_srl], ['extra_vars']);
-		$extra_vars = ($output->data && $output->data->extra_vars) ? unserialize($output->data->extra_vars) : new \stdClass();
+		$extra_vars = ($output->data && $output->data->extra_vars) ? unserialize($output->data->extra_vars) : new stdClass();
 		if (!is_object($extra_vars))
 		{
-			$extra_vars = new \stdClass();
+			$extra_vars = new stdClass();
 		}
 		$extra_vars->refused_reason = '스팸 이미지 OCR 자동차단. 문의: webmaster@fanbinit.us';
 		$args->extra_vars = serialize($extra_vars);
 
 		$output = $oMemberController->updateMember($args, true, true);
-		\MemberController::clearMemberCache($args->member_srl);
-		\Context::setValidatorMessage('layouts/rx-flextagram', '스팸 이미지 OCR로 자동 차단되었습니다. 문의: webmaster@fanbinit.us', 'error');
+		MemberController::clearMemberCache($args->member_srl);
+		Context::setValidatorMessage('layouts/rx-flextagram', '스팸 이미지 OCR로 자동 차단되었습니다. 문의: webmaster@fanbinit.us', 'error');
 	}
 
 	/**
@@ -368,7 +381,7 @@ class EventHandlers extends Base
 	 */
 	public function triggerAddMemberMenu($oModule)
 	{
-		$oMemberController = \memberController::getInstance();
+		$oMemberController = MemberController::getInstance();
 		$oMemberController->addMemberMenu('dispYeokboxPickLog', '댓글 추첨 기록');
 		$oMemberController->addMemberMenu('dispYeokboxPickInfo', '댓글 추첨 정보 확인');
  	}

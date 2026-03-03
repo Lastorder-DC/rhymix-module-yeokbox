@@ -4,6 +4,13 @@ namespace Rhymix\Modules\Yeokbox\Controllers;
 
 use BaseObject;
 use Context;
+use DB;
+use DocumentController;
+use DocumentModel;
+use Exception;
+use PointController;
+use PointModel;
+use stdClass;
 
 /**
  * 역박스 커스텀
@@ -48,7 +55,7 @@ class DocumentFunc extends Base
 		$targetSrl = (int) Context::get('target_srl');
 		$isAdmin = ($loggedInfo->is_admin === 'Y');
 
-		$oDocument = \DocumentModel::getDocument($targetSrl);
+		$oDocument = DocumentModel::getDocument($targetSrl);
 		if (!$oDocument->isExists() || !$oDocument->isEditable() || !$oDocument->isAccessible()) {
 			return new BaseObject(-1, 'msg_not_permitted');
 		}
@@ -61,11 +68,11 @@ class DocumentFunc extends Base
 			return new BaseObject(-1, '구인 카테고리 이외 글은 끌어올릴 수 없습니다.');
 		}
 
-		if (!$isAdmin && \PointModel::getPoint($loggedInfo->member_srl) < self::BUMP_POINT_COST) {
+		if (!$isAdmin && PointModel::getPoint($loggedInfo->member_srl) < self::BUMP_POINT_COST) {
 			return new BaseObject(-1, '포인트가 부족합니다.');
 		}
 
-		$obj = new \stdClass();
+		$obj = new stdClass();
 		$obj->document_srl = $oDocument->get('document_srl');
 		$obj->list_order = getNextSequence() * -1;
 		$obj->update_order = $obj->list_order;
@@ -75,10 +82,10 @@ class DocumentFunc extends Base
 			return $output;
 		}
 
-		\DocumentController::clearDocumentCache($obj->document_srl);
+		DocumentController::clearDocumentCache($obj->document_srl);
 
 		if (!$isAdmin) {
-			\PointController::setPoint($loggedInfo->member_srl, self::BUMP_POINT_COST, 'minus');
+			PointController::setPoint($loggedInfo->member_srl, self::BUMP_POINT_COST, 'minus');
 		}
 
 		return new BaseObject(0, '글을 끌어올렸습니다.');
@@ -103,7 +110,7 @@ class DocumentFunc extends Base
 			return new BaseObject(-1, '필수 값이 누락되었습니다');
 		}
 
-		$args = new \stdClass();
+		$args = new stdClass();
 		$args->module_srl = $moduleSrl;
 		$args->category_srl = $sourceCategorySrl;
 		$args->list_count = self::BULK_MOVE_LIMIT;
@@ -118,12 +125,12 @@ class DocumentFunc extends Base
 			return new BaseObject(0, '이동할 게시글이 없습니다.');
 		}
 
-		$oDB = \DB::getInstance();
+		$oDB = DB::getInstance();
 		$oDB->beginTransaction();
 
 		try {
 			foreach ($documentList as $document) {
-				$updateArgs = new \stdClass();
+				$updateArgs = new stdClass();
 				$updateArgs->document_srl = $document->document_srl;
 				$updateArgs->category_srl = $targetCategorySrl;
 
@@ -133,16 +140,16 @@ class DocumentFunc extends Base
 					return $output;
 				}
 
-				\DocumentController::clearDocumentCache($document->document_srl);
+				DocumentController::clearDocumentCache($document->document_srl);
 			}
 
 			$oDB->commit();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$oDB->rollback();
 			return new BaseObject(-1, '오류가 발생하여 작업을 취소했습니다: ' . $e->getMessage());
 		}
 
-		$oDocumentController = \documentController::getInstance();
+		$oDocumentController = DocumentController::getInstance();
 		$oDocumentController->updateCategoryCount($moduleSrl, $sourceCategorySrl);
 		$oDocumentController->updateCategoryCount($moduleSrl, $targetCategorySrl);
 

@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "thiagoalessio/tesseract_ocr": "^2.13",
-        "rhymix/composer-stub": "dev-master"
+        "rhymix/composer-stub": "dev-master",
+        "geoip2/geoip2": "~3.0"
     },
     "authors": [
         {

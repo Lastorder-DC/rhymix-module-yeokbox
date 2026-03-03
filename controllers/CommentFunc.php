@@ -4,6 +4,9 @@ namespace Rhymix\Modules\Yeokbox\Controllers;
 
 use BaseObject;
 use Context;
+use CommentModel;
+use MemberModel;
+use stdClass;
 
 /**
  * 역박스 커스텀
@@ -31,7 +34,7 @@ class CommentFunc extends Base
 			return new BaseObject(-1, '대상 문서가 지정되지 않았습니다.');
 		}
 
-		$comment_list = \CommentModel::getCommentList($target_srl, 0, 0, 1000);
+		$comment_list = CommentModel::getCommentList($target_srl, 0, 0, 1000);
 		$comment_list = $comment_list->data;
 
 		if (empty($comment_list))
@@ -45,7 +48,7 @@ class CommentFunc extends Base
 
 		// 추첨 기록 저장
 		$pick_srl = getNextSequence();
-		$log = new \stdClass();
+		$log = new stdClass();
 		$log->pick_srl = $pick_srl;
 		$log->document_srl = $target_srl;
 		$log->comment_srl = intval($picked->comment_srl);
@@ -57,7 +60,7 @@ class CommentFunc extends Base
 		executeQuery('yeokbox.insertPickLog', $log);
 
 		// 당첨 결과 반환
-		$result = new \stdClass();
+		$result = new stdClass();
 		$result->comment_srl = $picked->comment_srl;
 		$result->nick_name = $picked->nick_name;
 		$result->content = $picked->content;
@@ -80,7 +83,7 @@ class CommentFunc extends Base
 			return new BaseObject(-1, '로그인이 필요합니다.');
 		}
 
-		$args = new \stdClass();
+		$args = new stdClass();
 		$args->member_srl = intval($logged_info->member_srl);
 		$args->page = intval(Context::get('page')) ?: 1;
 		$output = executeQueryArray('yeokbox.getPickLogByMember', $args);
@@ -106,7 +109,7 @@ class CommentFunc extends Base
 			return new BaseObject(-1, '추첨 번호가 지정되지 않았습니다.');
 		}
 
-		$args = new \stdClass();
+		$args = new stdClass();
 		$args->pick_srl = $pick_srl;
 		$output = executeQuery('yeokbox.getPickLogByPickSrl', $args);
 
@@ -118,10 +121,10 @@ class CommentFunc extends Base
 		$pick_log = $output->data;
 
 		// 추첨 진행한 회원 닉네임 조회
-		$picker_info = \MemberModel::getMemberInfoByMemberSrl(intval($pick_log->member_srl));
+		$picker_info = MemberModel::getMemberInfoByMemberSrl(intval($pick_log->member_srl));
 		$picker_nick_name = $picker_info->nick_name ?? '';
 
-		$result = new \stdClass();
+		$result = new stdClass();
 		$result->pick_srl = $pick_log->pick_srl;
 		$result->document_srl = $pick_log->document_srl;
 		$result->picker_nick_name = $picker_nick_name;
