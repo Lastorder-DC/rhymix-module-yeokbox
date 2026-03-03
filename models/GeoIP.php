@@ -51,6 +51,10 @@ class GeoIP
 		{
 			return '';
 		}
-		return '<img src="https://flagcdn.com/16x12/' . $code . '.png" alt="' . $code . '">';
+		return '<picture>'
+			. '<source type="image/webp" srcset="https://flagcdn.com/16x12/' . $code . '.webp">'
+			. '<source type="image/png" srcset="https://flagcdn.com/16x12/' . $code . '.png">'
+			. '<img src="https://flagcdn.com/16x12/' . $code . '.png" alt="' . $code . '">'
+			. '</picture>';
 	}
 }
