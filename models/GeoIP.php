@@ -47,14 +47,13 @@ class GeoIP
 	public static function getFlag(string $code): string
 	{
 		$code = strtolower($code);
-		if (!preg_match('/^[a-z]{2}$/', $code))
-		{
+		if (!preg_match('/^[a-z]{2}$/', $code)) {
 			return '';
 		}
-		return '<picture>'
-			. '<source type="image/webp" srcset="https://flagcdn.com/16x12/' . $code . '.webp, https://flagcdn.com/32x24/' . $code . '.webp 2x, https://flagcdn.com/48x36/' . $code . '.webp 3x">'
-			. '<source type="image/png" srcset="https://flagcdn.com/16x12/' . $code . '.png, https://flagcdn.com/32x24/' . $code . '.png 2x, https://flagcdn.com/48x36/' . $code . '.png 3x">'
-			. '<img src="https://flagcdn.com/16x12/' . $code . '.png" alt="' . $code . '">'
-			. '</picture>';
+		
+		return '<img '
+			. 'src="https://flagcdn.com/16x12/' . $code . '.webp" '
+			. 'srcset="https://flagcdn.com/16x12/' . $code . '.webp 1x, https://flagcdn.com/32x24/' . $code . '.webp 2x, https://flagcdn.com/48x36/' . $code . '.webp 3x" '
+			. 'alt="' . $code . '">';
 	}
 }
