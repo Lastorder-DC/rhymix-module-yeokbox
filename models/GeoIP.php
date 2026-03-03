@@ -52,8 +52,8 @@ class GeoIP
 			return '';
 		}
 		return '<picture>'
-			. '<source type="image/webp" srcset="https://flagcdn.com/16x12/' . $code . '.webp">'
-			. '<source type="image/png" srcset="https://flagcdn.com/16x12/' . $code . '.png">'
+			. '<source type="image/webp" srcset="https://flagcdn.com/16x12/' . $code . '.webp, https://flagcdn.com/32x24/' . $code . '.webp 2x, https://flagcdn.com/48x36/' . $code . '.webp 3x">'
+			. '<source type="image/png" srcset="https://flagcdn.com/16x12/' . $code . '.png, https://flagcdn.com/32x24/' . $code . '.png 2x, https://flagcdn.com/48x36/' . $code . '.png 3x">'
 			. '<img src="https://flagcdn.com/16x12/' . $code . '.png" alt="' . $code . '">'
 			. '</picture>';
 	}
